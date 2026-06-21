@@ -6,6 +6,7 @@ using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Blog;
 using StarBlog.Web.Criteria;
 using X.PagedList;
+using StarBlog.Web.ViewModels;
 
 namespace StarBlog.Web.Controllers;
 
@@ -14,6 +15,7 @@ public class BlogController : Controller {
     private readonly MessageService _messages;
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<Category> _categoryRepo;
+    private readonly IBaseRepository<PostTranslation> _translationRepo;
     private readonly PostService _postService;
     private readonly CategoryService _categoryService;
     private readonly ConfigService _configService;
@@ -22,6 +24,7 @@ public class BlogController : Controller {
 
     public BlogController(IBaseRepository<Post> postRepo,
         IBaseRepository<Category> categoryRepo,
+        IBaseRepository<PostTranslation> translationRepo,
         PostService postService,
         MessageService messages,
         CategoryService categoryService,
@@ -30,6 +33,7 @@ public class BlogController : Controller {
         StructuredDataService structuredDataService) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
+        _translationRepo = translationRepo;
         _postService = postService;
         _messages = messages;
         _categoryService = categoryService;
@@ -80,12 +84,12 @@ public class BlogController : Controller {
     }
 
     [Route("/p/{slug}")]
-    public async Task<IActionResult> PostBySlug(string slug) {
+    public async Task<IActionResult> PostBySlug(string slug, [FromQuery] string? lang) {
         var p = await _postRepo.Where(a => a.Slug == slug).FirstAsync();
-        return await Post(p?.Id ?? "");
+        return await Post(p?.Id ?? "", lang);
     }
 
-    public async Task<IActionResult> Post(string id) {
+    public async Task<IActionResult> Post(string id, [FromQuery] string? lang) {
         var post = await _postService.GetById(id);
 
         if (post == null) {
@@ -99,6 +103,38 @@ public class BlogController : Controller {
         }
 
         var postViewModel = await _postService.GetPostViewModel(post);
+
+        // 查询可用翻译语言
+        var translations = await _translationRepo
+            .Where(t => t.PostId == post.Id)
+            .ToListAsync();
+        postViewModel.AvailableLanguages = translations
+            .Select(t => t.Language)
+            .Distinct()
+            .ToList();
+
+        // 如果指定了语言且有翻译，替换内容
+        if (!string.IsNullOrEmpty(lang) && lang != "zh") {
+            var translation = translations.FirstOrDefault(t => t.Language == lang);
+            if (translation != null) {
+                postViewModel.Title = translation.Title;
+                postViewModel.Summary = translation.Summary;
+                postViewModel.Content = translation.Content;
+                postViewModel.CurrentLanguage = lang;
+                if (!string.IsNullOrEmpty(translation.Content)) {
+                    postViewModel.ContentHtml = PostService.GetContentHtml(translation);
+                }
+            }
+        }
+
+        // 存储语言偏好到 Cookie
+        if (!string.IsNullOrEmpty(lang)) {
+            Response.Cookies.Append("blog_lang", lang, new CookieOptions {
+                Expires = DateTimeOffset.UtcNow.AddYears(1),
+                HttpOnly = false,
+                IsEssential = true
+            });
+        }
 
         // 设置SEO元数据
         ViewData["SeoMetadata"] = _seoService.GetPostSeoMetadata(postViewModel);

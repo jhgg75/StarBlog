@@ -19,6 +19,21 @@ public class PostViewModel {
     public List<Category> Categories { get; set; }
     public List<TocNode>? TocNodes { get; set; }
 
+    /// <summary>
+    /// 当前语言（null 或 "zh" 表示中文原文）
+    /// </summary>
+    public string? CurrentLanguage { get; set; }
+
+    /// <summary>
+    /// 可用的翻译语言列表
+    /// </summary>
+    public List<string> AvailableLanguages { get; set; } = new();
+
+    /// <summary>
+    /// 当前是否显示翻译版本
+    /// </summary>
+    public bool IsTranslation => !string.IsNullOrEmpty(CurrentLanguage) && CurrentLanguage != "zh";
+
     public string TocNodesJson => JsonSerializer.Serialize(
         TocNodes,
         new JsonSerializerOptions {

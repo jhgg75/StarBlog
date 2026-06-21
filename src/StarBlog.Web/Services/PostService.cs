@@ -267,6 +267,17 @@ public class PostService {
     }
 
     /// <summary>
+    /// 将 Markdown 内容转换为 HTML（支持翻译内容）
+    /// </summary>
+    public static string GetContentHtml(PostTranslation translation) {
+        var pipeline = new MarkdownPipelineBuilder()
+                       .UseAdvancedExtensions()
+                       .UseBootstrap5()
+                       .Build();
+        return Markdown.ToHtml(translation.Content ?? "", pipeline);
+    }
+
+    /// <summary>
     /// 初始化博客文章的资源目录
     /// </summary>
     /// <param name="post"></param>

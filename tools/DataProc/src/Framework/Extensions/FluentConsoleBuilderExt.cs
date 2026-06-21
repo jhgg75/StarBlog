@@ -32,6 +32,8 @@ public static class FluentConsoleBuilderExt {
             .Bind(config.GetSection("SummaryGenerator"));
         builder.Services.AddOptions<SlugGeneratorSettings>()
             .Bind(config.GetSection("SlugGenerator"));
+        builder.Services.AddOptions<TranslationSettings>()
+            .Bind(config.GetSection(TranslationSettings.SectionName));
 
         return builder;
     }

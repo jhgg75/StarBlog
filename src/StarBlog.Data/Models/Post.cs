@@ -77,4 +77,9 @@ public class Post {
     /// 文章的分类层级, 其内容类似这样 `1,2,3` , 用逗号分隔开分类ID
     /// </summary>
     public string? Categories { get; set; }
+
+    /// <summary>
+    /// 文章翻译列表
+    /// </summary>
+    public List<PostTranslation>? Translations { get; set; }
 }

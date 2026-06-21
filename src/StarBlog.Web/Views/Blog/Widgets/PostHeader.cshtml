@@ -2,6 +2,30 @@
 
 <header class="post-header py-3 mb-3">
     <h1 class="post-title h3 font-weight-bold">@Model.Title</h1>
+
+    @if (Model.AvailableLanguages.Any()) {
+        <div class="mb-2">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Language switcher">
+                <a href="@Context.Request.Path"
+                   class="btn btn-outline-secondary @(Model.IsTranslation ? "" : "active")">
+                    中文
+                </a>
+                @foreach (var lang in Model.AvailableLanguages) {
+                    var langLabel = lang switch {
+                        "en" => "English",
+                        "ja" => "日本語",
+                        "ko" => "한국어",
+                        _ => lang
+                    };
+                    <a href="@($"{Context.Request.Path}?lang={lang}")"
+                       class="btn btn-outline-secondary @(Model.CurrentLanguage == lang ? "active" : "")">
+                        @langLabel
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
     <div class="border-bottom my-3"></div>
     <div class="post-meta">
         <div class="d-flex justify-content-between">

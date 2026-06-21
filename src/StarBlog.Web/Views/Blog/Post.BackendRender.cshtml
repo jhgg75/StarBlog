@@ -31,6 +31,16 @@
         <div class="col-lg-9">
             <partial name="Widgets/PostHeader" model="Model"/>
 
+            @if (Model.IsTranslation) {
+                <div class="alert alert-info d-flex align-items-center mb-3" role="alert">
+                    <i class="fas fa-language me-2"></i>
+                    <span>
+                        This is a translated version.
+                        <a href="@Context.Request.Path" class="alert-link">View original (中文)</a>
+                    </span>
+                </div>
+            }
+
             <div class="post-content">
                 @Html.Raw(Model.ContentHtml)
             </div>

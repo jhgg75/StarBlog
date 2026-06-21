@@ -142,4 +142,55 @@ public static partial class PromptTemplates {
         """;
     
     #endregion
+
+    #region 文章翻译
+
+    /// <summary>
+    /// 文章标题翻译模板
+    /// </summary>
+    public const string ArticleTitleTranslation =
+        """
+        Translate the following Chinese text to {{language}}.
+        Return ONLY the translated text, nothing else.
+        Preserve any technical terms, brand names, or proper nouns.
+
+        Text: {{title}}
+        """;
+
+    /// <summary>
+    /// 文章摘要翻译模板
+    /// </summary>
+    public const string ArticleSummaryTranslation =
+        """
+        Translate the following Chinese text to {{language}}.
+        Return ONLY the translated text, nothing else.
+        Preserve any technical terms, brand names, or proper nouns.
+
+        Text: {{summary}}
+        """;
+
+    /// <summary>
+    /// 文章 Markdown 内容翻译模板
+    /// </summary>
+    public const string ArticleContentTranslation =
+        """
+        You are a professional translator specializing in technical content.
+        Translate the following Markdown content from Chinese to {{language}}.
+
+        Rules:
+        1. Preserve ALL Markdown formatting (headings, lists, links, bold, italic, tables)
+        2. Do NOT translate content inside code blocks (```...```)
+        3. Do NOT translate inline code (`...`)
+        4. Do NOT translate URLs or image paths
+        5. Preserve all HTML tags if any
+        6. Keep the translation natural and fluent
+        7. For technical terms, keep the original Chinese in parentheses if helpful
+
+        Return ONLY the translated Markdown content.
+
+        Content:
+        {{content}}
+        """;
+
+    #endregion
 }

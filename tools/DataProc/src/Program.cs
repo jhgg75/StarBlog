@@ -49,10 +49,11 @@ Console.WriteLine("  2. ImageOptimizer        - 图片优化");
 Console.WriteLine("  3. SlugGenerator         - URL Slug 生成");
 Console.WriteLine("  4. SummaryGenerator      - 文章摘要生成");
 Console.WriteLine("  5. DataInsightScript     - 数据洞察分析");
+Console.WriteLine("  6. ArticleTranslator     - 文章翻译（中文→英文）");
 Console.WriteLine();
 Console.WriteLine("  0. 退出程序");
 Console.WriteLine();
-Console.Write("请输入选择 (0-5): ");
+Console.Write("请输入选择 (0-6): ");
 
 var choice = Console.ReadLine()?.Trim();
 
@@ -82,9 +83,13 @@ switch (choice) {
         Console.WriteLine("正在启动数据洞察分析服务...");
         await app.Run<DataInsightScript>();
         break;
+    case "6":
+        Console.WriteLine("正在启动文章翻译服务...");
+        await app.Run<ArticleTranslator>();
+        break;
     default:
         Console.WriteLine($"无效选择: '{choice}'");
-        Console.WriteLine("请输入 0-5 之间的数字。");
+        Console.WriteLine("请输入 0-6 之间的数字。");
         Console.WriteLine("程序退出。");
         return;
 }
