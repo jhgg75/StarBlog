@@ -25,10 +25,13 @@ public class BlogPostController : ControllerBase {
     private readonly IMapper _mapper;
     private readonly PostService _postService;
     private readonly BlogService _blogService;
+    private readonly TranslationService _translationService;
 
-    public BlogPostController(PostService postService, BlogService blogService, IMapper mapper) {
+    public BlogPostController(PostService postService, BlogService blogService,
+        TranslationService translationService, IMapper mapper) {
         _postService = postService;
         _blogService = blogService;
+        _translationService = translationService;
         _mapper = mapper;
     }
 
@@ -176,4 +179,62 @@ public class BlogPostController : ControllerBase {
         var (data, rows) = await _blogService.SetTopPost(post);
         return new ApiResponse<TopPost> { Data = data, Message = $"ok. deleted {rows} old topPosts." };
     }
+
+    #region 翻译
+
+    /// <summary>
+    /// 翻译文章
+    /// </summary>
+    [HttpPost("{id}/[action]")]
+    public async Task<ApiResponse> Translate(string id, [FromQuery] string language = "en") {
+        var post = await _postService.GetById(id);
+        if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
+
+        try {
+            var translation = await _translationService.TranslatePostAsync(id, language);
+            return ApiResponse.Ok(new {
+                translation.Id,
+                translation.Language,
+                translation.Title
+            }, $"文章翻译完成: {translation.Title}");
+        }
+        catch (Exception ex) {
+            return ApiResponse.BadRequest($"翻译失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 获取文章的翻译
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("{id}/[action]")]
+    public async Task<ApiResponse<PostTranslation>> GetTranslation(string id, [FromQuery] string language = "en") {
+        var translation = await _translationService.GetTranslation(id, language);
+        return translation == null
+            ? ApiResponse.NotFound($"未找到 {language} 翻译")
+            : new ApiResponse<PostTranslation>(translation);
+    }
+
+    /// <summary>
+    /// 获取文章的可用翻译语言列表
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("{id}/[action]")]
+    public async Task<ApiResponse<List<string>>> AvailableTranslations(string id) {
+        var languages = await _translationService.GetAvailableLanguages(id);
+        return new ApiResponse<List<string>>(languages);
+    }
+
+    /// <summary>
+    /// 删除翻译
+    /// </summary>
+    [HttpDelete("{id}/[action]/{translationId}")]
+    public async Task<ApiResponse> DeleteTranslation(string id, string translationId) {
+        var rows = await _translationService.DeleteTranslation(translationId);
+        return rows > 0
+            ? ApiResponse.Ok($"翻译已删除")
+            : ApiResponse.NotFound("翻译不存在");
+    }
+
+    #endregion
 }

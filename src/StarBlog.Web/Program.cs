@@ -130,6 +130,10 @@ builder.Services.AddScoped<SeoService>();
 builder.Services.AddScoped<StructuredDataService>();
 builder.Services.AddScoped<ImageSeoService>();
 builder.Services.AddScoped<SitemapService>();
+builder.Services.AddScoped<TranslationService>();
+
+// 翻译配置
+builder.Services.Configure<TranslationConfig>(builder.Configuration.GetSection(TranslationConfig.SectionName));
 
 builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection("Outbox"));
 builder.Services.AddScoped<OutboxService>();
