@@ -1,3 +1,7 @@
+# ship 部署工具
+.ship/
+deploy/.env
+
 dist/
 src/StarBlog.Web/wwwroot/lib/
 src/StarBlog.Web/wwwroot/assets

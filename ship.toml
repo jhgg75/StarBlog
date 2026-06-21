@@ -1,0 +1,69 @@
+schema = 2
+
+[project]
+name = "starblog"
+description = "StarBlog 博客系统"
+
+[version]
+source = "git-tag"
+fallback = "dev"
+override_env = "SHIP_VERSION"
+
+[features]
+publish = true
+deploy = true
+rollback = true
+verify = false
+
+[vars]
+registry = "ccr.ccs.tencentyun.com"
+namespace = "deali"
+image = "starblog"
+
+# ── 构建阶段 ──────────────────────────────────────────────────────
+[build]
+driver = "docker"
+
+[build.docker]
+image = "{{ vars.namespace }}/{{ vars.image }}"
+context = "./src"
+dockerfile = "StarBlog.Web/Dockerfile"
+platforms = ["linux/amd64"]
+load = true
+
+# ── 发布阶段 ──────────────────────────────────────────────────────
+[publish]
+driver = "registry"
+
+[publish.registry]
+push = true
+tag_latest_on_default_profile = true
+
+[[publish.registry.targets]]
+type = "private"
+url = "{{ vars.registry }}"
+namespace = "{{ vars.namespace }}"
+image = "{{ vars.image }}"
+
+# ── 模板生成 ──────────────────────────────────────────────────────
+[[templates]]
+path = "./deploy/.env"
+content = """
+IMAGE_NAME={{ vars.registry }}/{{ vars.namespace }}/{{ vars.image }}
+IMAGE_TAG={{ version }}
+"""
+
+# ── 部署阶段 ──────────────────────────────────────────────────────
+[deploy]
+driver = "compose"
+
+[deploy.compose]
+host = "deali.cn"
+path = "/home/deali/projects/starblog2"
+local_file = "./deploy/compose.prod.yaml"
+remote_file = "compose.yaml"
+local_env_file = "./deploy/.env"
+env_file = ".env"
+auto_env_file = true
+tag_key = "IMAGE_TAG"
+up = "docker compose up -d --remove-orphans"

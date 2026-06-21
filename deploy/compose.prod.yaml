@@ -1,0 +1,16 @@
+services:
+  starblog:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    container_name: starblog
+    restart: unless-stopped
+    ports:
+      - "5038:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__SQLite=Data Source=/app/data/app.db;Synchronous=Off;Cache Size=5000;
+      - ConnectionStrings__SQLite-Log=Data Source=/app/data/app.log.db;
+    volumes:
+      - starblog-data:/app/data
+
+volumes:
+  starblog-data:
