@@ -100,7 +100,9 @@ public class HomeController : Controller {
         userRepo.Insert(new User {
             Id = Guid.NewGuid().ToString(),
             Name = vm.Username,
-            Password = vm.Password.ToSHA256()
+            Password = vm.Password.ToSHA256(),
+            MustChangePassword = false,
+            LastPasswordChangeTime = DateTime.UtcNow
         });
 
         _messages.Success("初始化完成！");

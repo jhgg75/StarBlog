@@ -7,8 +7,10 @@ using Serilog;
 using Serilog.Events;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using StarBlog.Application.Abstractions;
+using StarBlog.Application.Models.Config;
 using StarBlog.Data;
 using StarBlog.Data.Extensions;
+using StarBlog.Application.Services;
 using StarBlog.Web.Contrib.SiteMessage;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Filters;
@@ -124,6 +126,7 @@ try {
     builder.Services.AddAuth(builder.Configuration);
     builder.Services.AddHttpClient();
     builder.Services.AddImageSharp();
+    builder.Services.Configure<BootstrapOptions>(builder.Configuration.GetSection(BootstrapOptions.SectionName));
 
     builder.Services.Configure<TranslationConfig>(builder.Configuration.GetSection(TranslationConfig.SectionName));
 
@@ -134,6 +137,11 @@ try {
     builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = long.MaxValue; });
 
     var app = builder.Build();
+
+    await using (var scope = app.Services.CreateAsyncScope()) {
+        var startupBootstrapService = scope.ServiceProvider.GetRequiredService<StartupBootstrapService>();
+        await startupBootstrapService.RunAsync();
+    }
 
     if (app.Environment.IsDevelopment()) {
         app.UseDeveloperExceptionPage();
@@ -210,6 +218,7 @@ try {
     app.UseRouting();
     app.UseCors();
     app.UseAuthentication();
+    app.UseMiddleware<RequirePasswordChangeMiddleware>();
     app.UseAuthorization();
     app.UseSession();
     app.UseSwaggerPkg();

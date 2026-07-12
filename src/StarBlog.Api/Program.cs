@@ -8,9 +8,11 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using StarBlog.Api.Adapters;
 using StarBlog.Api.Extensions;
 using StarBlog.Api.Filters;
+using StarBlog.Api.Middlewares;
 using StarBlog.Api.Services.BackgroundTasks;
 using StarBlog.Api.Services.OutboxServices;
 using StarBlog.Application.Abstractions;
+using StarBlog.Application.Models.Config;
 using StarBlog.Application.Services;
 using StarBlog.Application.Services.OutboxServices;
 using StarBlog.Data;
@@ -101,6 +103,7 @@ try {
     builder.Services.AddSettings(builder.Configuration);
     builder.Services.AddAuth(builder.Configuration);
     builder.Services.AddImageSharp();
+    builder.Services.Configure<BootstrapOptions>(builder.Configuration.GetSection(BootstrapOptions.SectionName));
 
     builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection("Outbox"));
     builder.Services.AddHostedService<OutboxWorker>();
@@ -111,6 +114,11 @@ try {
     });
 
     var app = builder.Build();
+
+    await using (var scope = app.Services.CreateAsyncScope()) {
+        var startupBootstrapService = scope.ServiceProvider.GetRequiredService<StartupBootstrapService>();
+        await startupBootstrapService.RunAsync();
+    }
 
     if (app.Environment.IsDevelopment()) {
         app.UseDeveloperExceptionPage();
@@ -154,6 +162,7 @@ try {
     app.UseRouting();
     app.UseCors();
     app.UseAuthentication();
+    app.UseMiddleware<RequirePasswordChangeMiddleware>();
     app.UseAuthorization();
     app.UseSwaggerPkg();
 

@@ -51,4 +51,24 @@ public class AuthController : ControllerBase {
         if (user == null) return ApiResponse.NotFound("找不到用户资料");
         return new ApiResponse<User>(user);
     }
+
+    [Authorize]
+    [HttpPost]
+    [Route("[action]")]
+    [ProducesResponseType(typeof(ApiResponse<LoginToken>), StatusCodes.Status200OK)]
+    public async Task<ApiResponse> ChangePassword(ChangePasswordRequest request) {
+        var user = _authService.GetUser(User);
+        if (user == null) return ApiResponse.Unauthorized("未登录");
+
+        try {
+            var token = await _authService.ChangePasswordAsync(user.Id, request.CurrentPassword, request.NewPassword);
+            return ApiResponse.Ok(token);
+        }
+        catch (UnauthorizedAccessException) {
+            return ApiResponse.Unauthorized("当前密码错误");
+        }
+        catch (InvalidOperationException ex) {
+            return ApiResponse.Error(ex.Message);
+        }
+    }
 }

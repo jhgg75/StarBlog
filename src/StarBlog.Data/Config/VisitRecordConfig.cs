@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StarBlog.Data.Extensions;
@@ -32,12 +32,14 @@ public class VisitRecordConfig : IEntityTypeConfiguration<VisitRecord> {
         });
 
         builder.Property(e => e.RequestPath)
+            .IsRequired()
             .HasMaxLength(2048);
 
         builder.Property(e => e.RequestQueryString)
             .HasMaxLength(2048);
 
         builder.Property(e => e.RequestMethod)
+            .IsRequired()
             .HasMaxLength(10);
 
         builder.Property(e => e.UserAgent)
@@ -62,7 +64,12 @@ public class VisitRecordConfig : IEntityTypeConfiguration<VisitRecord> {
                 nb.Property(u => u.Minor).HasMaxLength(20);
                 nb.Property(u => u.Patch).HasMaxLength(20);
             });
+
+            info.Navigation(e => e.OS).IsRequired();
+            info.Navigation(e => e.Device).IsRequired();
+            info.Navigation(e => e.UserAgent).IsRequired();
         });
+        builder.Navigation(e => e.UserAgentInfo).IsRequired();
 
         builder.Property(e => e.Time)
             .IsRequired();
