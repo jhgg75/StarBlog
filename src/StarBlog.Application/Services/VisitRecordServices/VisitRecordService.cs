@@ -1,4 +1,4 @@
-using System.Linq.Dynamic.Core;
+﻿using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
 using StarBlog.Data;
 using StarBlog.Data.Models;
@@ -9,6 +9,7 @@ using X.PagedList;
 
 namespace StarBlog.Application.Services.VisitRecordServices;
 
+[ScopedDependency]
 public class VisitRecordAnalyticsService {
     private readonly ILogger<VisitRecordAnalyticsService> _logger;
     private readonly AppDbContext _dbContext;
@@ -18,7 +19,7 @@ public class VisitRecordAnalyticsService {
         _dbContext = dbContext;
     }
 
-    public async Task<VisitRecord?> GetById(int id) {
+    public async Task<VisitRecord > GetById(int id) {
         var item = await _dbContext.VisitRecords.FirstOrDefaultAsync(e => e.Id == id);
         return item;
     }
@@ -151,13 +152,13 @@ public class VisitRecordAnalyticsService {
     /// <summary>
     /// 获取地理信息筛选参数
     /// </summary>
-    public async Task<List<string?>> GetGeoFilterParams(VisitRecordParameters p, string param = "country") {
+    public async Task<List<string >> GetGeoFilterParams(VisitRecordParameters p, string param = "country") {
         var qs = _dbContext.VisitRecords.ApplyFilters(p);
         return param switch {
             "country" => await qs.Select(e => e.IpInfo.Country).Distinct().ToListAsync(),
             "province" => await qs.Select(e => e.IpInfo.Province).Distinct().ToListAsync(),
             "city" => await qs.Select(e => e.IpInfo.City).Distinct().ToListAsync(),
-            _ => new List<string?>()
+            _ => new List<string >()
         };
     }
 

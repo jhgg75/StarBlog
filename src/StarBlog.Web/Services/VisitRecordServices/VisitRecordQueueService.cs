@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using AutoMapper;
 using IP2Region.Net.Abstractions;
 using StarBlog.Data;
@@ -7,6 +7,7 @@ using UAParser;
 
 namespace StarBlog.Web.Services.VisitRecordServices;
 
+[SingletonDependency]
 public class VisitRecordQueueService {
     private readonly ConcurrentQueue<VisitRecord> _logQueue = new ConcurrentQueue<VisitRecord>();
     private readonly ILogger<VisitRecordQueueService> _logger;

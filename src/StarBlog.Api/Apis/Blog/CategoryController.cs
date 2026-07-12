@@ -34,7 +34,7 @@ public class CategoryController : ControllerBase {
     /// </summary>
     [AllowAnonymous]
     [HttpGet("Nodes")]
-    public async Task<List<CategoryNode>?> GetNodes() {
+    public async Task<List<CategoryNode> > GetNodes() {
         return await _cService.GetNodes();
     }
 
@@ -58,7 +58,7 @@ public class CategoryController : ControllerBase {
     [HttpGet("{id:int}")]
     public async Task<ApiResponse<Category>> Get(int id) {
         var item = await _cService.GetById(id);
-        return item == null ? ApiResponse.NotFound() : new ApiResponse<Category> {Data = item};
+        return item == null ? ApiResponse.NotFound() : new ApiResponse<Category> { Data = item };
     }
 
     [HttpPost]
@@ -102,7 +102,7 @@ public class CategoryController : ControllerBase {
     /// <summary>
     /// 设置为推荐分类
     /// </summary>
-    /// <seealso href="https://fontawesome.com/search?m=free">FontAwesome图标库</seealso>
+    /// <seealso href="https://fontawesome.com/search m=free">FontAwesome图标库</seealso>
     /// <param name="id"></param>
     /// <param name="dto">推荐信息 <see cref="FeaturedCategoryCreationDto"/></param>
     /// <returns></returns>

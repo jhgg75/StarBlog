@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using FreeSql.DataAnnotations;
 
 namespace StarBlog.Data.Models;
@@ -29,13 +29,13 @@ public class PostTranslation {
     /// <summary>
     /// 翻译后的摘要
     /// </summary>
-    public string? Summary { get; set; }
+    public string  Summary { get; set; }
 
     /// <summary>
     /// 翻译后的 Markdown 内容
     /// </summary>
     [MaxLength(-1)]
-    public string? Content { get; set; }
+    public string  Content { get; set; }
 
     public DateTime CreationTime { get; set; }
     public DateTime LastUpdateTime { get; set; }

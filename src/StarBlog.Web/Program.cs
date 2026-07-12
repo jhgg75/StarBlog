@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using RobotsTxt;
 using Serilog;
 using Serilog.Events;
@@ -21,6 +23,14 @@ Log.Logger = new LoggerConfiguration()
 
 try {
     var builder = WebApplication.CreateBuilder(args);
+
+    builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+    builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder => {
+        containerBuilder.RegisterModule(new AutofacDependencyModule(
+            typeof(Program).Assembly,
+            typeof(StarBlog.Application.Services.BlogService).Assembly
+        ));
+    });
 
     builder.Host.UseSerilog((context, services, loggerConfiguration) => {
         loggerConfiguration
@@ -114,33 +124,10 @@ try {
     builder.Services.AddAuth(builder.Configuration);
     builder.Services.AddHttpClient();
     builder.Services.AddImageSharp();
-    builder.Services.AddSingleton<CommonService>();
-    builder.Services.AddSingleton<EmailService>();
-    builder.Services.AddSingleton<MessageService>();
-    builder.Services.AddSingleton<ThemeService>();
-    builder.Services.AddSingleton<TempFilterService>();
-    builder.Services.AddSingleton<MonitoringService>();
-    builder.Services.AddSingleton<IBackgroundTaskQueue, StarBlog.Application.Services.BackgroundTaskQueue>();
-    builder.Services.AddScoped<BlogService>();
-    builder.Services.AddScoped<CategoryService>();
-    builder.Services.AddScoped<CommentService>();
-    builder.Services.AddScoped<ConfigService>();
-    builder.Services.AddScoped<LinkExchangeService>();
-    builder.Services.AddScoped<LinkService>();
-    builder.Services.AddScoped<PhotoService>();
-    builder.Services.AddScoped<PostService>();
-    builder.Services.AddScoped<SeoService>();
-    builder.Services.AddScoped<StructuredDataService>();
-    builder.Services.AddScoped<ImageSeoService>();
-    builder.Services.AddScoped<SitemapService>();
-    builder.Services.AddScoped<TranslationService>();
 
     builder.Services.Configure<TranslationConfig>(builder.Configuration.GetSection(TranslationConfig.SectionName));
 
     builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection("Outbox"));
-    builder.Services.AddScoped<OutboxService>();
-    builder.Services.AddScoped<OutboxProcessor>();
-    builder.Services.AddScoped<IOutboxHandler, EmailSendOutboxHandler>();
     builder.Services.AddHostedService<OutboxWorker>();
     builder.Services.AddHostedService<BackgroundTaskWorker>();
 

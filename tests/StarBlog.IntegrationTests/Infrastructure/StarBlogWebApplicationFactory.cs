@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +16,7 @@ public sealed class StarBlogWebApplicationFactory : WebApplicationFactory<Progra
         var dataDbPath = _workspace.GetPath("app.data.db");
         var logDbPath = _workspace.GetPath("app.log.db");
 
-        var config = new Dictionary<string, string?> {
+        var config = new Dictionary<string, string> {
             ["host"] = "http://localhost",
             ["ConnectionStrings:SQLite"] = $"Data Source={dataDbPath}",
             ["ConnectionStrings:SQLite-Log"] = $"Data Source={logDbPath}"

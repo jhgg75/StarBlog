@@ -1,4 +1,4 @@
-using CodeLab.Share.ViewModels.Response;
+﻿using CodeLab.Share.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
@@ -78,7 +78,7 @@ public class VisitRecordController : ControllerBase {
     /// <param name="p">访问记录筛选条件</param>
     /// <param name="param">可选 country, province, city</param>
     [HttpGet("[action]")]
-    public async Task<ApiResponse<List<string?>>> GeoFilterParams([FromQuery] VisitRecordParameters p, string param = "country") {
+    public async Task<ApiResponse<List<string>>> GeoFilterParams([FromQuery] VisitRecordParameters p, string param = "country") {
         return await _service.GetGeoFilterParams(p, param);
     }
 

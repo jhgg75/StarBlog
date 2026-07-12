@@ -4,6 +4,7 @@ using StarBlog.Web.ViewModels;
 
 namespace StarBlog.Web.Services;
 
+[ScopedDependency]
 public class StructuredDataService {
     private readonly ConfigService _configService;
 

@@ -10,7 +10,7 @@ public class Category {
 
     public int ParentId { get; set; }
     [Navigate(nameof(ParentId))]
-    public Category? Parent { get; set; }
+    public Category  Parent { get; set; }
     [Navigate(nameof(ParentId))]
     public List<Category> Children { get; set; }
 

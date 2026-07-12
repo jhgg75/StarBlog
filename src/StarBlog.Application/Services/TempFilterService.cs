@@ -3,6 +3,7 @@ using CodeLab.Share.Contrib.StopWords;
 
 namespace StarBlog.Application.Services;
 
+[SingletonDependency]
 public class TempFilterService {
     private readonly ILogger<TempFilterService> _logger;
     private readonly StopWordsToolkit _toolkit;

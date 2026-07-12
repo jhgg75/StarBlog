@@ -6,6 +6,7 @@ namespace StarBlog.Web.Services;
 /// <summary>
 /// 友情链接
 /// </summary>
+[ScopedDependency]
 public class LinkService {
     private IBaseRepository<Link> _repo;
 
@@ -23,11 +24,11 @@ public class LinkService {
             : await _repo.Select.ToListAsync();
     }
 
-    public async Task<Link?> GetById(int id) {
+    public async Task<Link > GetById(int id) {
         return await _repo.Where(a => a.Id == id).FirstAsync();
     }
 
-    public async Task<Link?> GetByName(string name) {
+    public async Task<Link > GetByName(string name) {
         return await _repo.Where(a => a.Name == name).FirstAsync();
     }
 
@@ -42,7 +43,7 @@ public class LinkService {
         return await _repo.InsertOrUpdateAsync(item);
     }
 
-    public async Task<Link?> SetVisibility(int id, bool visible) {
+    public async Task<Link > SetVisibility(int id, bool visible) {
         var item = await GetById(id);
         if (item == null) return null;
         item.Visible = visible;

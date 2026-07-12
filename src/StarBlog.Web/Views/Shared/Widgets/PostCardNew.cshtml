@@ -1,4 +1,4 @@
-@using StarBlog.Content.Extensions
+﻿@using StarBlog.Content.Extensions
 @model Post
 
 @{
@@ -19,7 +19,7 @@
             <a href="@postHref" class="mb-1 text-info">
                 <h5 class="card-title">@Model.Title</h5>
             </a>
-            <small class="card-text text-muted mb-auto">@Model.Summary?.LimitWithEllipsis(120)</small>
+            <small class="card-text text-muted mb-auto">@Model.Summary .LimitWithEllipsis(120)</small>
             <div class="d-flex justify-content-between mt-3">
                 <div>
                     <span class="text-muted me-3">

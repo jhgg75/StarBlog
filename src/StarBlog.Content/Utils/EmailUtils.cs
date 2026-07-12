@@ -1,4 +1,4 @@
-using MailKit;
+﻿using MailKit;
 using MailKit.Net.Proxy;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -38,7 +38,7 @@ public static class EmailUtils {
     public static async Task<MessageSentEventArgs> SendEmailAsync(
         EmailAccountConfig config,
         MimeMessage message,
-        HttpProxyClient? proxyClient = null
+        HttpProxyClient  proxyClient = null
     ) {
         MessageSentEventArgs result = null;
         using var client = new SmtpClient {

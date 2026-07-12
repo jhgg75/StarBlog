@@ -1,4 +1,4 @@
-using FreeSql;
+﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Contrib.SiteMessage;
@@ -84,12 +84,12 @@ public class BlogController : Controller {
     }
 
     [Route("/p/{slug}")]
-    public async Task<IActionResult> PostBySlug(string slug, [FromQuery] string? lang) {
+    public async Task<IActionResult> PostBySlug(string slug, [FromQuery] string lang) {
         var p = await _postRepo.Where(a => a.Slug == slug).FirstAsync();
         return await Post(p?.Id ?? "", lang);
     }
 
-    public async Task<IActionResult> Post(string id, [FromQuery] string? lang) {
+    public async Task<IActionResult> Post(string id, [FromQuery] string lang) {
         var post = await _postService.GetById(id);
 
         if (post == null) {

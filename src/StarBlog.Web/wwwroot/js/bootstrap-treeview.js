@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
  * bootstrap-treeview.js v1.2.0
  * =========================================================
  * Copyright 2013 Jonathan Miles
@@ -322,7 +322,7 @@
         let node = this.findNode(target);
         if (!node || node.state.disabled) return;
 
-        let classList = target.attr('class') ? target.attr('class').split(' ') : [];
+        let classList = target.attr('class')   target.attr('class').split(' ') : [];
         if ((classList.indexOf('expand-icon') !== -1)) {
 
             this.toggleExpandedState(node, _default.options);
@@ -508,10 +508,10 @@
             // 最外层包装
             let treeItem = $(_this.template.itemWrapper)
                 .addClass('node-' + _this.elementId)
-                .addClass(node.state.checked ? 'node-checked' : '')
-                .addClass(node.state.disabled ? 'node-disabled' : '')
-                .addClass(node.state.selected ? 'node-selected' : '')
-                .addClass(node.searchResult ? 'search-result' : '')
+                .addClass(node.state.checked   'node-checked' : '')
+                .addClass(node.state.disabled   'node-disabled' : '')
+                .addClass(node.state.selected   'node-selected' : '')
+                .addClass(node.searchResult   'search-result' : '')
                 .attr('data-nodeid', node.nodeId)
                 .attr('style', _this.buildStyleOverride(node));
 
@@ -724,7 +724,7 @@
     Tree.prototype.getSiblings = function (identifier) {
         let node = this.identifyNode(identifier);
         let parent = this.getParent(node);
-        let nodes = parent ? parent.nodes : this.tree;
+        let nodes = parent   parent.nodes : this.tree;
         return nodes.filter(function (obj) {
             return obj.nodeId !== node.nodeId;
         });
@@ -900,7 +900,7 @@
         options = $.extend({}, _default.options, options);
 
         $.each(nodes, $.proxy(function (index, node) {
-            this.setExpandedState(node, (level > 0) ? true : false, options);
+            this.setExpandedState(node, (level > 0)   true : false, options);
             if (node.nodes) {
                 this.expandLevels(node.nodes, level - 1, options);
             }
@@ -1091,7 +1091,7 @@
         Identifies a node from either a node id or object
     */
     Tree.prototype.identifyNode = function (identifier) {
-        return ((typeof identifier) === 'number') ?
+        return ((typeof identifier) === 'number')  
             this.nodes[identifier] :
             identifier;
     };

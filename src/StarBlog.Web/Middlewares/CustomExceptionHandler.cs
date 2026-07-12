@@ -15,11 +15,11 @@ public static class CustomExceptionHandler {
                 var exceptionHandlerPathFeature =
                     context.Features.Get<IExceptionHandlerPathFeature>();
 
-                if (exceptionHandlerPathFeature?.Error is FileNotFoundException) {
+                if (exceptionHandlerPathFeature .Error is FileNotFoundException) {
                     await context.Response.WriteAsync(" The file was not found.");
                 }
 
-                if (exceptionHandlerPathFeature?.Path == "/") {
+                if (exceptionHandlerPathFeature .Path == "/") {
                     await context.Response.WriteAsync(" Page: Home.");
                 }
             });

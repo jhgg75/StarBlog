@@ -7,6 +7,7 @@ using X.PagedList;
 
 namespace StarBlog.Web.Services;
 
+[ScopedDependency]
 public class CategoryService {
     private readonly IBaseRepository<Category> _cRepo;
     private readonly IBaseRepository<FeaturedCategory> _fcRepo;
@@ -23,7 +24,7 @@ public class CategoryService {
         _generator = generator;
     }
 
-    public async Task<List<CategoryNode>?> GetNodes() {
+    public async Task<List<CategoryNode> > GetNodes() {
         var categoryList = await _cRepo.Select
             .IncludeMany(a => a.Posts.Select(p => new Post { Id = p.Id }))
             .ToListAsync();
@@ -33,7 +34,7 @@ public class CategoryService {
     /// <summary>
     /// 生成文章分类树
     /// </summary>
-    public List<CategoryNode>? GetNodes(List<Category> categoryList, int parentId = 0) {
+    public List<CategoryNode>  GetNodes(List<Category> categoryList, int parentId = 0) {
         var categories = categoryList
             .Where(a => a.ParentId == parentId && a.Visible)
             .ToList();
@@ -79,7 +80,7 @@ public class CategoryService {
         return pagedList;
     }
 
-    public async Task<Category?> GetById(int id) {
+    public async Task<Category > GetById(int id) {
         return await _cRepo.Where(a => a.Id == id)
             .Include(a => a.Parent).FirstAsync();
     }
@@ -128,7 +129,7 @@ public class CategoryService {
         return await _fcRepo.Select.Include(a => a.Category).ToListAsync();
     }
 
-    public async Task<FeaturedCategory?> GetFeaturedCategoryById(int id) {
+    public async Task<FeaturedCategory > GetFeaturedCategoryById(int id) {
         return await _fcRepo.Where(a => a.Id == id)
             .Include(a => a.Category).FirstAsync();
     }

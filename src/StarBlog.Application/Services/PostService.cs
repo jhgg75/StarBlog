@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using FreeSql;
 using Markdig;
 using Markdig.Renderers.Normalize;
@@ -13,6 +13,7 @@ using X.PagedList;
 
 namespace StarBlog.Application.Services;
 
+[ScopedDependency]
 public class PostService {
     private readonly ILogger<PostService> _logger;
     private readonly IBaseRepository<Post> _postRepo;
@@ -53,7 +54,7 @@ public class PostService {
         return !await _postRepo.Select.AnyAsync(a => a.Slug == slug);
     }
 
-    public async Task<Post?> GetById(string id) {
+    public async Task<Post > GetById(string id) {
         // 获取文章的时候对markdown中的图片地址解析，加上完整地址返回给前端
         var post = await _postRepo.Where(a => a.Id == id).Include(a => a.Category).FirstAsync();
         if (post != null) post.Content = MdImageLinkConvert(post, true);
@@ -61,7 +62,7 @@ public class PostService {
         return post;
     }
 
-    public async Task<Post?> GetBySlug(string slug) {
+    public async Task<Post > GetBySlug(string slug) {
         var post = await _postRepo.Where(a => a.Slug == slug).FirstAsync();
         if (post != null) post.Content = MdImageLinkConvert(post, true);
         return post;

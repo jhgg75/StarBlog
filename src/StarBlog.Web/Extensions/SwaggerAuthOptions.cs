@@ -1,4 +1,4 @@
-using StarBlog.Web.Middlewares;
+﻿using StarBlog.Web.Middlewares;
 
 namespace StarBlog.Web.Extensions;
 
@@ -24,7 +24,7 @@ public class SwaggerAuthOptions {
     /// <summary>
     /// 自定义未授权响应消息
     /// </summary>
-    public string? UnauthorizedMessage { get; set; }
+    public string UnauthorizedMessage { get; set; }
 }
 
 /// <summary>
@@ -49,7 +49,7 @@ public static class SwaggerAuthConfigExtensions {
     /// <param name="app">应用程序构建器</param>
     /// <param name="options">授权选项</param>
     /// <returns>应用程序构建器</returns>
-    public static IApplicationBuilder UseSwaggerAuth(this IApplicationBuilder app, SwaggerAuthOptions? options = null) {
+    public static IApplicationBuilder UseSwaggerAuth(this IApplicationBuilder app, SwaggerAuthOptions options = null) {
         if (options != null) {
             // 如果设置了仅在生产环境启用，且当前不是生产环境，则跳过授权
             if (options.OnlyInProduction) {

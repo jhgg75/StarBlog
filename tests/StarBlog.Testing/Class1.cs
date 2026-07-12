@@ -1,10 +1,10 @@
-namespace StarBlog.Testing;
+﻿namespace StarBlog.Testing;
 
 public sealed class TempWorkspace : IDisposable {
     public string RootPath { get; }
 
-    public TempWorkspace(string? prefix = null) {
-        prefix ??= "starblog-tests";
+    public TempWorkspace(string  prefix = null) {
+        prefix   = "starblog-tests";
         RootPath = Path.Combine(Path.GetTempPath(), prefix, Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(RootPath);
     }

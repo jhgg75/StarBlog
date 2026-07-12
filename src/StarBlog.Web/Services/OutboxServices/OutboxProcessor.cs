@@ -1,4 +1,4 @@
-using FreeSql;
+﻿using FreeSql;
 using Microsoft.Extensions.Options;
 using StarBlog.Data.Models;
 
@@ -7,6 +7,7 @@ namespace StarBlog.Web.Services.OutboxServices;
 /// <summary>
 /// Outbox 处理器（领取 + 执行 + 重试）
 /// </summary>
+[ScopedDependency]
 public class OutboxProcessor {
     private readonly ILogger<OutboxProcessor> _logger;
     private readonly IFreeSql _fsql;

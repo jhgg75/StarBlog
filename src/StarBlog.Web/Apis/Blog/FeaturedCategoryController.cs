@@ -1,4 +1,4 @@
-﻿using CodeLab.Share.ViewModels.Response;
+using CodeLab.Share.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;

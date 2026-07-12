@@ -62,14 +62,14 @@
     methods: {
         getEmailOtp(email) {
             return new Promise((resolve, reject) => {
-                axios.get(`/Api/Comment/GetEmailOtp?email=${email}`)
+                axios.get(`/Api/Comment/GetEmailOtp email=${email}`)
                     .then(res => resolve(res.data))
                     .catch(res => resolve(res.response.data))
             })
         },
         getAnonymousUser(email, otp) {
             return new Promise((resolve, reject) => {
-                axios.get(`/Api/Comment/GetAnonymousUser?email=${email}&otp=${otp}`)
+                axios.get(`/Api/Comment/GetAnonymousUser email=${email}&otp=${otp}`)
                     .then(res => resolve(res.data))
                     .catch(res => resolve(res.response.data))
             })
@@ -96,7 +96,7 @@
                                 },
                                 createdTime: dayjs(e.createdTime).format('YYYY-MM-DD'),
                                 updatedTime: dayjs(e.updatedTime).format('YYYY-MM-DD'),
-                                avatar: `/Api/PicLib/Random/100/100?Seed=${e.anonymousUserId}`,
+                                avatar: `/Api/PicLib/Random/100/100 Seed=${e.anonymousUserId}`,
                             }
 
                             if (e.parent) {
@@ -158,7 +158,7 @@
         },
         async handleEmailOtpChange(value) {
             console.log('handleEmailOtpChange', value)
-            if (this.form.email?.length === 0 || value.length < 4) return
+            if (this.form.email .length === 0 || value.length < 4) return
 
             this.userNameLoading = true
             this.urlLoading = true

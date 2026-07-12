@@ -1,4 +1,4 @@
-﻿using CodeLab.Share.Extensions;
+using CodeLab.Share.Extensions;
 using CodeLab.Share.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

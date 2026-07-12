@@ -1,4 +1,4 @@
-using System.ServiceModel.Syndication;
+﻿using System.ServiceModel.Syndication;
 using System.Text;
 using System.Xml;
 using FreeSql;
@@ -49,7 +49,7 @@ public class RssController : Controller {
                 new TextSyndicationContent(PostService.GetContentHtml(item), TextSyndicationContentKind.Html),
                 new Uri(rssItemUrl), item.Id, item.LastUpdateTime
             ) {
-                Categories = {new SyndicationCategory(item.Category?.Name)},
+                Categories = {new SyndicationCategory(item.Category .Name)},
                 Authors = {new SyndicationPerson("admin@deali.cn", "DealiAxy", "https://deali.cn")},
                 PublishDate = item.CreationTime,
                 Summary = new TextSyndicationContent(item.Summary)

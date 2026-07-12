@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using FreeSql;
 using Microsoft.Extensions.Options;
 using StarBlog.Data.Models;
@@ -9,6 +9,7 @@ namespace StarBlog.Application.Services.OutboxServices;
 /// Outbox 入队服务
 /// <para>负责把“需要异步处理的任务”写入 app.db 的 outbox_message 表。</para>
 /// </summary>
+[ScopedDependency]
 public class OutboxService {
     private readonly ILogger<OutboxService> _logger;
     private readonly IBaseRepository<OutboxMessage> _outboxRepo;

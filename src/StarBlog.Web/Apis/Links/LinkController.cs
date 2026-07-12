@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using CodeLab.Share.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

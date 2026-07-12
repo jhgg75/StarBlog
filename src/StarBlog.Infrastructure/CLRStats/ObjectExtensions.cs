@@ -18,7 +18,7 @@ internal static class ObjectExtensions {
         return stringBuilder.ToString();
     }
 
-    private static void AppendValue(StringBuilder stringBuilder, object? item) {
+    private static void AppendValue(StringBuilder stringBuilder, object  item) {
         if (item == null) {
             stringBuilder.Append("null");
             return;

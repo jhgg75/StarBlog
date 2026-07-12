@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using FreeSql;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
@@ -11,6 +11,7 @@ using X.PagedList;
 
 namespace StarBlog.Application.Services;
 
+[ScopedDependency]
 public class PhotoService {
     private readonly IBaseRepository<Photo> _photoRepo;
     private readonly IBaseRepository<FeaturedPhoto> _featuredPhotoRepo;
@@ -44,11 +45,11 @@ public class PhotoService {
             .Include(a => a.Photo).ToListAsync(a => a.Photo);
     }
 
-    public async Task<Photo?> GetById(string id) {
+    public async Task<Photo > GetById(string id) {
         return await _photoRepo.Where(a => a.Id == id).FirstAsync();
     }
 
-    public async Task<Photo?> GetNext(string id) {
+    public async Task<Photo > GetNext(string id) {
         var photo = await _photoRepo.Where(a => a.Id == id).FirstAsync();
         if (photo == null) return null;
         var next = await _photoRepo
@@ -58,7 +59,7 @@ public class PhotoService {
         return next;
     }
 
-    public async Task<Photo?> GetPrevious(string id) {
+    public async Task<Photo > GetPrevious(string id) {
         var photo = await _photoRepo.Where(a => a.Id == id).FirstAsync();
         if (photo == null) return null;
         var next = await _photoRepo
@@ -132,7 +133,7 @@ public class PhotoService {
     /// <summary>
     /// 获取随机一张图片
     /// </summary>
-    public async Task<Photo?> GetRandomPhoto() {
+    public async Task<Photo > GetRandomPhoto() {
         var count = await _photoRepo.Select.CountAsync();
         if (count == 0) {
             return null;

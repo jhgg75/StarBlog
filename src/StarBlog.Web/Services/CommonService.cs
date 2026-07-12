@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using StarBlog.Content.Utils;
 
 namespace StarBlog.Web.Services;
@@ -6,6 +6,7 @@ namespace StarBlog.Web.Services;
 /// <summary>
 /// 一些公共服务
 /// </summary>
+[SingletonDependency]
 public class CommonService {
     private readonly ILogger<CommonService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
@@ -21,7 +22,7 @@ public class CommonService {
     /// <param name="url"></param>
     /// <param name="savePath">保存路径，需要完整路径</param>
     /// <returns></returns>
-    public async Task<string?> DownloadFileAsync(string url, string savePath) {
+    public async Task<string > DownloadFileAsync(string url, string savePath) {
         var httpClient = _httpClientFactory.CreateClient();
         try {
             var resp = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);

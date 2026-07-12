@@ -3,6 +3,7 @@ using CodeLab.Share.Contrib.StopWords;
 
 namespace StarBlog.Web.Services;
 
+[SingletonDependency]
 public class TempFilterService {
     private readonly ILogger<TempFilterService> _logger;
     private readonly StopWordsToolkit _toolkit;
@@ -11,7 +12,7 @@ public class TempFilterService {
 
     public TempFilterService(ILogger<TempFilterService> logger) {
         _logger = logger;
-        IEnumerable<Word>? words = null;
+        IEnumerable<Word> words = null;
         const string wordsPath = "words.json";
         if (File.Exists(wordsPath)) {
             words = JsonSerializer.Deserialize<IEnumerable<Word>>(File.ReadAllText(wordsPath));

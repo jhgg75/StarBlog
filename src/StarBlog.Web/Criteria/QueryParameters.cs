@@ -32,10 +32,10 @@ public class QueryParameters {
     /// <summary>
     /// 搜索关键词
     /// </summary>
-    public string? Search { get; set; }
+    public string Search { get; set; }
 
     /// <summary>
     /// 排序字段
     /// </summary>
-    public string? SortBy { get; set; }
+    public string SortBy { get; set; }
 }

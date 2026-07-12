@@ -1,4 +1,4 @@
-namespace StarBlog.Application.ViewModels.Blog;
+﻿namespace StarBlog.Application.ViewModels.Blog;
 
 public class PostUpdateDto {
     public string Id { get; set; } = string.Empty;
@@ -12,12 +12,12 @@ public class PostUpdateDto {
     /// 文章链接，设置后可以通过以下形式访问文章
     /// <para> http://starblog.com/p/post-slug1 </para>
     /// </summary>
-    public string? Slug { get; set; }
+    public string  Slug { get; set; }
     
     /// <summary>
     /// 文章标记
     /// </summary>
-    public string? Status { get; set; }
+    public string  Status { get; set; }
     
     /// <summary>
     /// 是否发表（不发表的话就是草稿状态）

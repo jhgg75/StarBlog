@@ -1,4 +1,4 @@
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Text;
 using FreeSql;
 using StarBlog.Content.Utils;
@@ -8,6 +8,7 @@ using StarBlog.Web.ViewModels.Blog;
 
 namespace StarBlog.Web.Services;
 
+[ScopedDependency]
 public class BlogService {
     private readonly IWebHostEnvironment _environment;
     private readonly IBaseRepository<Post> _postRepo;
@@ -46,8 +47,8 @@ public class BlogService {
         };
     }
 
-    public async Task<Post?> GetTopOnePost() {
-        return (await _topPostRepo.Select.Include(a => a.Post.Category).FirstAsync())?.Post;
+    public async Task<Post > GetTopOnePost() {
+        return (await _topPostRepo.Select.Include(a => a.Post.Category).FirstAsync()) .Post;
     }
 
     /// <summary>
@@ -100,7 +101,7 @@ public class BlogService {
     /// 获取文章的状态列表
     /// </summary>
     /// <returns></returns>
-    public async Task<List<string?>> GetStatusList() {
+    public async Task<List<string >> GetStatusList() {
         return await _postRepo.Select.GroupBy(a => a.Status)
             .ToListAsync(a => a.Key);
     }

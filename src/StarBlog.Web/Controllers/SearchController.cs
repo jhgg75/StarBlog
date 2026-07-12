@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using FreeSql;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
@@ -45,7 +45,7 @@ public class SearchController : Controller {
         });
     }
 
-    public static string GetHighlightedSnippet(string? content, string keyword, int snippetLength = 100) {
+    public static string GetHighlightedSnippet(string content, string keyword, int snippetLength = 100) {
         if (string.IsNullOrEmpty(content) || string.IsNullOrEmpty(keyword))
             return string.Empty;
 

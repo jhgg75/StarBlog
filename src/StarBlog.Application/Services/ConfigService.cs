@@ -1,8 +1,9 @@
-using FreeSql;
+﻿using FreeSql;
 using StarBlog.Data.Models;
 
 namespace StarBlog.Application.Services;
 
+[ScopedDependency]
 public class ConfigService {
     private readonly IConfiguration _conf;
     private readonly IBaseRepository<ConfigItem> _repo;
@@ -16,11 +17,11 @@ public class ConfigService {
         return _repo.Select.ToList();
     }
 
-    public ConfigItem? GetById(int id) {
+    public ConfigItem GetById(int id) {
         return _repo.Where(a => a.Id == id).First();
     }
 
-    public ConfigItem? GetByKey(string key) {
+    public ConfigItem GetByKey(string key) {
         var item = _repo.Where(a => a.Key == key).First();
         if (item == null) {
             // 尝试读取初始化配置
@@ -37,7 +38,7 @@ public class ConfigService {
         return _repo.InsertOrUpdate(item);
     }
 
-    public int? Update(string key, string value, string? description = default) {
+    public int? Update(string key, string value, string description = default) {
         var item = GetByKey(key);
         if (item == null) return null;
 

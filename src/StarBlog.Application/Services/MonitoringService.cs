@@ -6,6 +6,7 @@ namespace StarBlog.Application.Services;
 /// <summary>
 /// 监控服务，用于管理网站分析和监控配置
 /// </summary>
+[SingletonDependency]
 public class MonitoringService
 {
     private readonly Monitoring _config;

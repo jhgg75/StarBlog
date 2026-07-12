@@ -10,6 +10,7 @@ using StarBlog.Web.ViewModels.Auth;
 
 namespace StarBlog.Web.Services;
 
+[ScopedDependency]
 public class AuthService {
     private readonly Auth _auth;
     private readonly IBaseRepository<User> _userRepo;
@@ -46,15 +47,15 @@ public class AuthService {
         };
     }
 
-    public async Task<User?> GetUserById(string userId) {
+    public async Task<User > GetUserById(string userId) {
         return await _userRepo.Where(a => a.Id == userId).FirstAsync();
     }
 
-    public async Task<User?> GetUserByName(string name) {
+    public async Task<User > GetUserByName(string name) {
         return await _userRepo.Where(a => a.Name == name).FirstAsync();
     }
 
-    public User? GetUser(ClaimsPrincipal userClaim) {
+    public User  GetUser(ClaimsPrincipal userClaim) {
         var userId = userClaim.FindFirstValue(ClaimUserId);
         var userName = userClaim.FindFirstValue(ClaimUserName);
         if (userId == null || userName == null) return null;

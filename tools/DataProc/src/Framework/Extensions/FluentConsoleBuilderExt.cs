@@ -1,4 +1,4 @@
-using DataProc.Entities;
+﻿using DataProc.Entities;
 using DataProc.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +9,7 @@ namespace DataProc.Framework.Extensions;
 
 public static class FluentConsoleBuilderExt {
     public static FluentConsoleBuilder InitializeConfiguration(this FluentConsoleBuilder builder) {
-        IConfigurationRoot? config;
+        IConfigurationRoot  config;
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddEnvironmentVariables();
         configBuilder.SetBasePath(Environment.CurrentDirectory);

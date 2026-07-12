@@ -1,5 +1,5 @@
-namespace StarBlog.Application.ViewModels.Comments; 
+﻿namespace StarBlog.Application.ViewModels.Comments; 
 
 public class CommentAcceptDto {
-    public string? Reason { get; set; }
+    public string  Reason { get; set; }
 }

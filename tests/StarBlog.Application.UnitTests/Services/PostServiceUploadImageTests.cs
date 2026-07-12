@@ -16,7 +16,7 @@ public sealed class PostServiceUploadImageTests {
         Directory.CreateDirectory(webRoot);
 
         var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> {
+            .AddInMemoryCollection(new Dictionary<string, string > {
                 ["ConnectionStrings:SQLite"] = $"Data Source={workspace.GetPath("app.data.db")}",
                 ["StarBlog:Initial:host"] = "http://localhost"
             })

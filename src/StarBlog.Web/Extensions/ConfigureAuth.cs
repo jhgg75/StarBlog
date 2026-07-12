@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using StarBlog.Web.Models.Config;
@@ -8,7 +8,6 @@ namespace StarBlog.Web.Extensions;
 
 public static class ConfigureAuth {
     public static void AddAuth(this IServiceCollection services, IConfiguration configuration) {
-        services.AddScoped<AuthService>();
         services.AddAuthentication(options => {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

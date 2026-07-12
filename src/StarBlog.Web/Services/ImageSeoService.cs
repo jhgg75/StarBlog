@@ -1,8 +1,9 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using StarBlog.Data.Models;
 
 namespace StarBlog.Web.Services;
 
+[ScopedDependency]
 public class ImageSeoService {
     private readonly ConfigService _configService;
 
@@ -17,7 +18,7 @@ public class ImageSeoService {
         if (string.IsNullOrEmpty(content)) return content;
 
         // 匹配Markdown图片语法: ![alt](url "title")
-        var imagePattern = @"!\[([^\]]*)\]\(([^)]+)(?:\s+""([^""]*)"")?\)";
+        var imagePattern = @"!\[([^\]]*)\]\(([^)]+)( :\s+""([^""]*)"") \)";
         
         return Regex.Replace(content, imagePattern, match => {
             var altText = match.Groups[1].Value;
@@ -45,7 +46,7 @@ public class ImageSeoService {
         if (string.IsNullOrEmpty(htmlContent)) return htmlContent;
 
         // 匹配HTML img标签
-        var imgPattern = @"<img\s+([^>]*?)>";
+        var imgPattern = @"<img\s+([^>]* )>";
         
         return Regex.Replace(htmlContent, imgPattern, match => {
             var imgTag = match.Value;
@@ -110,7 +111,7 @@ public class ImageSeoService {
         if (string.IsNullOrEmpty(post.Content)) return imageUrls;
 
         // 从Markdown内容中提取图片
-        var imagePattern = @"!\[([^\]]*)\]\(([^)]+)(?:\s+""([^""]*)"")?\)";
+        var imagePattern = @"!\[([^\]]*)\]\(([^)]+)( :\s+""([^""]*)"") \)";
         var matches = Regex.Matches(post.Content, imagePattern);
 
         foreach (Match match in matches) {

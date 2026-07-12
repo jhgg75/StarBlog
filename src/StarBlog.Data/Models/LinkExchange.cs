@@ -17,7 +17,7 @@ public class LinkExchange {
     /// <summary>
     /// 介绍
     /// </summary>
-    public string? Description { get; set; }
+    public string  Description { get; set; }
 
     /// <summary>
     /// 网址
@@ -44,7 +44,7 @@ public class LinkExchange {
     /// 原因
     /// <para>如果验证不通过的话，可能会附上原因</para>
     /// </summary>
-    public string? Reason { get; set; }
+    public string  Reason { get; set; }
 
     /// <summary>
     /// 申请时间

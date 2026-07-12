@@ -1,4 +1,4 @@
-@using StarBlog.Content.Extensions
+﻿@using StarBlog.Content.Extensions
 @model HomeViewModel
 @{
     ViewData["Title"] = "Home Page";
@@ -214,7 +214,7 @@
     <!-- Hero Section JavaScript -->
     <script>
         // 平滑滚动到下一个部分
-        document.querySelector('.scroll-arrow')?.addEventListener('click', function () {
+        document.querySelector('.scroll-arrow') .addEventListener('click', function () {
             document.querySelector('#custom-cards').scrollIntoView({
                 behavior: 'smooth'
             });

@@ -1,5 +1,5 @@
-namespace StarBlog.Application.Criteria; 
+﻿namespace StarBlog.Application.Criteria; 
 
 public class CommentQueryParameters : QueryParameters {
-    public string? PostId { get; set; }
+    public string  PostId { get; set; }
 }

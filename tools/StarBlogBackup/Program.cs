@@ -1,4 +1,4 @@
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
@@ -371,7 +371,7 @@ internal static class OptionParser {
 }
 
 internal readonly record struct OptionValues(IReadOnlyDictionary<string, List<string>> Values) {
-    public string? GetString(string key)
+    public string GetString(string key)
         => Values.TryGetValue(key, out var list) && list.Count > 0 ? list[^1] : null;
 
     public bool HasFlag(string key)

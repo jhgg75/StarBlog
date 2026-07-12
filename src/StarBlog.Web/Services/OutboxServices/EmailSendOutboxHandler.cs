@@ -7,6 +7,7 @@ namespace StarBlog.Web.Services.OutboxServices;
 /// <summary>
 /// 邮件发送任务处理器
 /// </summary>
+[ScopedDependency]
 public class EmailSendOutboxHandler : IOutboxHandler {
     private readonly EmailService _emailService;
 

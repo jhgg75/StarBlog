@@ -8,7 +8,6 @@ namespace StarBlog.Api.Extensions;
 
 public static class ConfigureAuth {
     public static void AddAuth(this IServiceCollection services, IConfiguration configuration) {
-        services.AddScoped<AuthService>();
         services.AddAuthentication(options => {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

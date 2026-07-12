@@ -17,7 +17,7 @@ public class Link {
     /// <summary>
     /// 介绍
     /// </summary>
-    public string? Description { get; set; }
+    public string  Description { get; set; }
 
     /// <summary>
     /// 网址

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using DataProc.Entities;
 using DataProc.Utilities;
@@ -61,7 +61,7 @@ public class ArticleTranslator(
                 else {
                     failureCount++;
                     logger.LogError("文章 [{Title}] 翻译失败: {Error}", post.Title,
-                        result.Errors.FirstOrDefault()?.Message);
+                        result.Errors.FirstOrDefault() .Message);
                 }
 
                 // 延迟以避免速率限制
@@ -87,7 +87,7 @@ public class ArticleTranslator(
                     "title", post.Title, language);
 
                 // 2. 翻译摘要
-                string? summary = null;
+                string  summary = null;
                 if (!string.IsNullOrWhiteSpace(post.Summary)) {
                     summary = await TranslateText(
                         PromptTemplates.ArticleSummaryTranslation,
@@ -95,7 +95,7 @@ public class ArticleTranslator(
                 }
 
                 // 3. 翻译 Markdown 内容
-                string? content = null;
+                string  content = null;
                 if (!string.IsNullOrWhiteSpace(post.Content)) {
                     content = await TranslateMarkdown(post.Content, language);
                 }

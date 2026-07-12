@@ -1,7 +1,8 @@
-using StarBlog.Application.Abstractions;
+﻿using StarBlog.Application.Abstractions;
 
 namespace StarBlog.Api.Adapters;
 
+[SingletonDependency]
 public sealed class PhysicalFileStorage : IFileStorage {
     private readonly IAppPathProvider _paths;
 

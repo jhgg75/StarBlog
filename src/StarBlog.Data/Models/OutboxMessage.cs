@@ -1,4 +1,4 @@
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 
 namespace StarBlog.Data.Models;
 
@@ -31,7 +31,7 @@ public class OutboxMessage {
     /// 幂等键（可选）
     /// <para>用于避免同一业务事件重复入队（例如：reply:{replyId}）。</para>
     /// </summary>
-    public string? DedupKey { get; set; }
+    public string DedupKey { get; set; }
 
     /// <summary>
     /// 任务载荷（JSON 字符串） 
@@ -68,13 +68,13 @@ public class OutboxMessage {
     /// <summary>
     /// 租约锁：持有者标识（可用于排查与追踪）
     /// </summary>
-    public string? LockedBy { get; set; }
+    public string LockedBy { get; set; }
 
     /// <summary>
     /// 最后一次失败原因（可截断）
     /// </summary>
     [Column(StringLength = 4000)]
-    public string? LastError { get; set; }
+    public string LastError { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;

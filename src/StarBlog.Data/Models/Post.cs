@@ -20,14 +20,14 @@ public class Post {
     /// <para> http://starblog.com/p/post-slug1 </para>
     /// </summary>
     [MaxLength(150)]
-    public string? Slug { get; set; }
+    public string  Slug { get; set; }
     
     /// <summary>
     /// 文章标记，提取原markdown文件的文件名前缀，用于区分文章状态，例子如下
     /// <para>《（未完成）StarBlog博客开发笔记(3)：模型设计》</para>
     /// <para>《（未发布）StarBlog博客开发笔记(3)：模型设计》</para>
     /// </summary>
-    public string? Status { get; set; }
+    public string  Status { get; set; }
     
     // todo 新增 tag 功能
 
@@ -39,19 +39,19 @@ public class Post {
     /// <summary>
     /// 梗概
     /// </summary>
-    public string? Summary { get; set; }
+    public string  Summary { get; set; }
 
     /// <summary>
     /// 内容（markdown格式）
     /// </summary>
     [MaxLength(-1)]
-    public string? Content { get; set; }
+    public string  Content { get; set; }
 
     /// <summary>
     /// 博客在导入前的相对路径
     /// <para>如："系列/AspNetCore开发笔记"</para>
     /// </summary>
-    public string? Path { get; set; }
+    public string  Path { get; set; }
 
     /// <summary>
     /// 创建时间
@@ -71,15 +71,15 @@ public class Post {
     /// <summary>
     /// 分类
     /// </summary>
-    public Category? Category { get; set; }
+    public Category  Category { get; set; }
 
     /// <summary>
     /// 文章的分类层级, 其内容类似这样 `1,2,3` , 用逗号分隔开分类ID
     /// </summary>
-    public string? Categories { get; set; }
+    public string  Categories { get; set; }
 
     /// <summary>
     /// 文章翻译列表
     /// </summary>
-    public List<PostTranslation>? Translations { get; set; }
+    public List<PostTranslation>  Translations { get; set; }
 }

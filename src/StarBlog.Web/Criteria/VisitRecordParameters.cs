@@ -7,7 +7,7 @@ public class VisitRecordParameters : QueryParameters {
     /// <summary>
     /// 排序字段
     /// </summary>
-    public new string? SortBy { get; set; } = "-Time";
+    public new string SortBy { get; set; } = "-Time";
 
     /// <summary>
     /// 排除 API 接口
@@ -26,39 +26,39 @@ public class VisitRecordParameters : QueryParameters {
     /// <summary>
     /// 国家
     /// </summary>
-    public string? Country { get; set; }
+    public string Country { get; set; }
 
     /// <summary>
     /// 省份
     /// </summary>
-    public string? Province { get; set; }
+    public string Province { get; set; }
 
     /// <summary>
     /// 城市
     /// </summary>
-    public string? City { get; set; }
+    public string City { get; set; }
 
     /// <summary>
     /// 运营商
     /// </summary>
-    public string? Isp { get; set; }
+    public string Isp { get; set; }
 
     /// <summary>
     /// 操作系统
     /// </summary>
     [JsonPropertyName("os")]
     [JsonProperty("os")]
-    public string? OS { get; set; }
+    public string OS { get; set; }
 
     /// <summary>
     /// 设备
     /// </summary>
-    public string? Device { get; set; }
+    public string Device { get; set; }
 
     /// <summary>
     /// UA
     /// </summary>
-    public string? UserAgent { get; set; }
+    public string UserAgent { get; set; }
 
     /// <summary>
     /// 是否爬虫

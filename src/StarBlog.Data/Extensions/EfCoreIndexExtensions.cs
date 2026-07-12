@@ -21,7 +21,7 @@ public static class EfCoreIndexExtensions {
         this EntityTypeBuilder<T> builder,
         Expression<Func<T, TOwned>> ownedNavigation,
         Expression<Func<TOwned, TProperty>> propertyExpression,
-        string? indexName = null)
+        string  indexName = null)
         where T : class
         where TOwned : class {
         var ownedPropertyName = GetPropertyName(ownedNavigation);

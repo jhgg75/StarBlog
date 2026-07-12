@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Net;
 
 namespace StarBlog.Web.Middlewares;
@@ -52,7 +52,7 @@ public class SwaggerAuthMiddleware
     /// </summary>
     /// <param name="path">请求路径</param>
     /// <returns>是否为Swagger路径</returns>
-    private static bool IsSwaggerPath(string? path)
+    private static bool IsSwaggerPath(string path)
     {
         if (string.IsNullOrEmpty(path)) return false;
         

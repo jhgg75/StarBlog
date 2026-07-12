@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using FreeSql;
@@ -10,6 +10,7 @@ using StarBlog.Application.ViewModels.Auth;
 
 namespace StarBlog.Application.Services;
 
+[ScopedDependency]
 public class AuthService {
     private readonly Auth _auth;
     private readonly IBaseRepository<User> _userRepo;
@@ -46,17 +47,17 @@ public class AuthService {
         };
     }
 
-    public async Task<User?> GetUserById(string userId) {
+    public async Task<User > GetUserById(string userId) {
         return await _userRepo.Where(a => a.Id == userId).FirstAsync();
     }
 
-    public async Task<User?> GetUserByName(string name) {
+    public async Task<User > GetUserByName(string name) {
         return await _userRepo.Where(a => a.Name == name).FirstAsync();
     }
 
-    public User? GetUser(ClaimsPrincipal userClaim) {
-        var userId = userClaim.FindFirst(ClaimUserId)?.Value;
-        var userName = userClaim.FindFirst(ClaimUserName)?.Value;
+    public User  GetUser(ClaimsPrincipal userClaim) {
+        var userId = userClaim.FindFirst(ClaimUserId) .Value;
+        var userName = userClaim.FindFirst(ClaimUserName) .Value;
         if (userId == null || userName == null) return null;
         return new User { Id = userId, Name = userName };
     }

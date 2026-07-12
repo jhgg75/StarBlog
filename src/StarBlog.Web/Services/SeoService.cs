@@ -1,8 +1,9 @@
-using StarBlog.Data.Models;
+﻿using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels;
 
 namespace StarBlog.Web.Services;
 
+[ScopedDependency]
 public class SeoService {
     private readonly ConfigService _configService;
 
@@ -135,22 +136,22 @@ public class SeoMetadata {
     public string Title { get; set; } = "";
     public string Description { get; set; } = "";
     public string Keywords { get; set; } = "";
-    public string? CanonicalUrl { get; set; }
+    public string CanonicalUrl { get; set; }
 
     // Open Graph
     public string OgTitle { get; set; } = "";
     public string OgDescription { get; set; } = "";
     public string OgType { get; set; } = "website";
     public string OgUrl { get; set; } = "";
-    public string? OgImage { get; set; }
-    public string? OgArticleAuthor { get; set; }
+    public string OgImage { get; set; }
+    public string OgArticleAuthor { get; set; }
     public DateTime? OgArticlePublishedTime { get; set; }
     public DateTime? OgArticleModifiedTime { get; set; }
-    public string? OgArticleSection { get; set; }
+    public string OgArticleSection { get; set; }
 
     // Twitter Card
     public string TwitterCard { get; set; } = "summary";
     public string TwitterTitle { get; set; } = "";
     public string TwitterDescription { get; set; } = "";
-    public string? TwitterImage { get; set; }
+    public string TwitterImage { get; set; }
 }

@@ -12,7 +12,7 @@ public class PostQueryParameters : QueryParameters {
     /// <summary>
     /// 文章状态
     /// </summary>
-    public string? Status { get; set; }
+    public string Status { get; set; }
     
     /// <summary>
     /// 分类ID
@@ -27,5 +27,5 @@ public class PostQueryParameters : QueryParameters {
     /// <summary>
     /// 排序字段
     /// </summary>
-    public new string? SortBy { get; set; } = "-LastUpdateTime";
+    public new string SortBy { get; set; } = "-LastUpdateTime";
 }

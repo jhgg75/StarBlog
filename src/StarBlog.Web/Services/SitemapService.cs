@@ -8,6 +8,7 @@ namespace StarBlog.Web.Services;
 /// <summary>
 /// 统一的Sitemap生成服务
 /// </summary>
+[ScopedDependency]
 public class SitemapService {
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<Category> _categoryRepo;

@@ -1,9 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace StarBlog.Web.ViewModels.Comments;
 
 public class CommentCreationDto {
-    public string? ParentId { get; set; }
+    public string  ParentId { get; set; }
 
     [Required]
     public string PostId { get; set; } = string.Empty;
@@ -17,7 +17,7 @@ public class CommentCreationDto {
     public string Email { get; set; } = string.Empty;
 
     [Url(ErrorMessage = "请输入正确的url")]
-    public string? Url { get; set; }
+    public string  Url { get; set; }
 
     [Required(ErrorMessage = "邮箱验证码不能为空")]
     [StringLength(4, ErrorMessage = "长度为 4 个字符")]

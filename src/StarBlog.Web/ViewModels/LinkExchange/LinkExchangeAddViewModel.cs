@@ -14,7 +14,7 @@ public class LinkExchangeAddViewModel {
     /// 介绍
     /// </summary>
     [Display(Name = "介绍")]
-    public string? Description { get; set; }
+    public string  Description { get; set; }
 
     /// <summary>
     /// 网址

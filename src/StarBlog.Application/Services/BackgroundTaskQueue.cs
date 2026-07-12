@@ -3,6 +3,7 @@ using StarBlog.Application.Abstractions;
 
 namespace StarBlog.Application.Services;
 
+[SingletonDependency]
 public sealed class BackgroundTaskQueue : IBackgroundTaskQueue {
     private readonly Channel<Func<CancellationToken, Task>> _queue;
 

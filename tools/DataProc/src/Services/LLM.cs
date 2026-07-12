@@ -1,4 +1,4 @@
-using System.ClientModel;
+﻿using System.ClientModel;
 using DataProc.Entities;
 using FluentResults;
 using Microsoft.Extensions.AI;
@@ -11,7 +11,8 @@ public class LLM : IService {
     public LLM(IOptions<LLMSettings> llmOptions) {
         var llmConfig = llmOptions.Value;
         var endpoint = llmConfig.Endpoint
-            ?? throw new InvalidOperationException("LLM Endpoint 未配置。");
+               ??
+               throw new InvalidOperationException("LLM Endpoint 未配置。");
         ChatClient = new OpenAIClient(
             new ApiKeyCredential(llmConfig.Key ?? throw new InvalidOperationException("LLM Key 未配置。")),
             new OpenAIClientOptions {

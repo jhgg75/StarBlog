@@ -5,6 +5,7 @@ using StarBlog.Content.Utils;
 
 namespace StarBlog.Web.Services;
 
+[SingletonDependency]
 public class EmailService {
     private readonly ILogger<EmailService> _logger;
     private readonly EmailAccountConfig _emailAccountConfig;

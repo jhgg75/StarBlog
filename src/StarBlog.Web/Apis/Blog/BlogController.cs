@@ -31,8 +31,8 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("Top")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Post?>))]
-    public async Task<Post?> GetTopOnePost() {
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Post >))]
+    public async Task<Post > GetTopOnePost() {
         return await _blogService.GetTopOnePost();
     }
 
@@ -62,8 +62,8 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("[action]")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string?>))]
-    public async Task<List<string?>> GetStatusList() {
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string >))]
+    public async Task<List<string >> GetStatusList() {
         return await _blogService.GetStatusList();
     }
 

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using FreeSql;
 using StarBlog.Data.Models;
 using StarBlog.Application.Services.OutboxServices;
@@ -8,6 +8,7 @@ namespace StarBlog.Application.Services;
 /// <summary>
 /// 友情链接申请
 /// </summary>
+[ScopedDependency]
 public class LinkExchangeService {
     private readonly IBaseRepository<LinkExchange> _repo;
     private readonly LinkService _linkService;
@@ -34,7 +35,7 @@ public class LinkExchangeService {
         return await _repo.Select.ToListAsync();
     }
 
-    public async Task<LinkExchange?> GetById(int id) {
+    public async Task<LinkExchange > GetById(int id) {
         return await _repo.Where(a => a.Id == id).FirstAsync();
     }
 
@@ -42,7 +43,7 @@ public class LinkExchangeService {
         return await _repo.InsertOrUpdateAsync(item);
     }
 
-    public async Task<LinkExchange?> SetVerifyStatus(int id, bool status, string? reason = null) {
+    public async Task<LinkExchange > SetVerifyStatus(int id, bool status, string  reason = null) {
         var item = await GetById(id);
         if (item == null) return null;
 

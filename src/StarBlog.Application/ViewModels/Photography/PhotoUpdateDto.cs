@@ -1,9 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace StarBlog.Application.ViewModels.Photography;
 
 public class PhotoUpdateDto {
-    public string? Id { get; set; }
+    public string  Id { get; set; }
     
     /// <summary>
     /// 作品标题

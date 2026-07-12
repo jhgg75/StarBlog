@@ -84,7 +84,7 @@ public class CommentController : ControllerBase {
 
         var anonymousUser = await _commentService.GetOrCreateAnonymousUser(
             dto.UserName, dto.Email, dto.Url,
-            HttpContext.GetRemoteIpAddress()?.ToString().Split(":")?.Last()
+            HttpContext.GetRemoteIpAddress() .ToString().Split(":") .Last()
         );
 
         var comment = new Comment {
@@ -117,7 +117,7 @@ public class CommentController : ControllerBase {
     }
 
     [HttpGet("[action]")]
-    public async Task<List<Comment>?> GetAll(string postId) {
+    public async Task<List<Comment> > GetAll(string postId) {
         return await _commentService.GetAll(postId);
     }
 

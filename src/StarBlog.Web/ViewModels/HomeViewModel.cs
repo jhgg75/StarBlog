@@ -6,7 +6,7 @@ public class HomeViewModel {
     /// <summary>
     /// 随机图片
     /// </summary>
-    public Photo? RandomPhoto { get; set; }
+    public Photo  RandomPhoto { get; set; }
 
     /// <summary>
     /// 是否显示 Chart
@@ -21,7 +21,7 @@ public class HomeViewModel {
     /// <summary>
     /// 置顶博客
     /// </summary>
-    public Post? TopPost { get; set; }
+    public Post  TopPost { get; set; }
 
     /// <summary>
     /// 推荐博客

@@ -1,4 +1,4 @@
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.Extensions.WebEncoders.Testing;
 using StarBlog.Data.Models;
@@ -14,7 +14,7 @@ public class BlogListViewModel {
     public int CurrentCategoryId { get; set; }
     public IPagedList<Post> Posts { get; set; } = new StaticPagedList<Post>([], 1, 1, 0);
     public List<Category> Categories { get; set; } = [];
-    public List<CategoryNode>? CategoryNodes { get; set; }
+    public List<CategoryNode>  CategoryNodes { get; set; }
 
     public string CategoryNodesJson => JsonSerializer.Serialize(
         CategoryNodes,

@@ -1,4 +1,4 @@
-using System.ClientModel;
+﻿using System.ClientModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using FreeSql;
@@ -30,12 +30,13 @@ public class LLMConfig {
 /// <summary>
 /// 文章翻译服务
 /// </summary>
+[ScopedDependency]
 public class TranslationService {
     private readonly ILogger<TranslationService> _logger;
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<PostTranslation> _translationRepo;
     private readonly TranslationConfig _config;
-    private readonly IChatClient? _chatClient;
+    private readonly IChatClient _chatClient;
 
     public TranslationService(
         ILogger<TranslationService> logger,
@@ -63,7 +64,7 @@ public class TranslationService {
     /// <summary>
     /// 获取文章的翻译
     /// </summary>
-    public async Task<PostTranslation?> GetTranslation(string postId, string language) {
+    public async Task<PostTranslation> GetTranslation(string postId, string language) {
         return await _translationRepo
             .Where(t => t.PostId == postId && t.Language == language)
             .FirstAsync();
@@ -99,14 +100,14 @@ public class TranslationService {
         _logger.LogInformation("  标题翻译完成: {Title}", title);
 
         // 2. 翻译摘要
-        string? summary = null;
+        string summary = null;
         if (!string.IsNullOrWhiteSpace(post.Summary)) {
             summary = await TranslateText(post.Summary, language, "summary");
             _logger.LogInformation("  摘要翻译完成");
         }
 
         // 3. 翻译 Markdown 内容
-        string? content = null;
+        string content = null;
         if (!string.IsNullOrWhiteSpace(post.Content)) {
             content = await TranslateMarkdown(post.Content, language);
             _logger.LogInformation("  内容翻译完成");

@@ -7,6 +7,7 @@ using UAParser;
 
 namespace StarBlog.Application.Services.VisitRecordServices;
 
+[SingletonDependency]
 public class VisitRecordQueueService {
     private readonly ConcurrentQueue<VisitRecord> _logQueue = new ConcurrentQueue<VisitRecord>();
     private readonly ILogger<VisitRecordQueueService> _logger;

@@ -1,5 +1,6 @@
 ﻿namespace StarBlog.Web.Contrib.SiteMessage; 
 
+[SingletonDependency]
 public class MessageService {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private const string DefaultTitle = "提示信息";
@@ -10,7 +11,7 @@ public class MessageService {
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public HttpContext? HttpContext => _httpContextAccessor.HttpContext;
+    public HttpContext  HttpContext => _httpContextAccessor.HttpContext;
 
     public Queue<Message> CurrentQueue {
         get {

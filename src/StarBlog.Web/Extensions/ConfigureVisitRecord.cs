@@ -7,8 +7,6 @@ namespace StarBlog.Web.Extensions;
 
 public static class ConfigureVisitRecord {
     public static IServiceCollection AddVisitRecord(this IServiceCollection services) {
-        services.AddScoped<VisitRecordAnalyticsService>();
-        services.AddSingleton<VisitRecordQueueService>();
         services.AddHostedService<VisitRecordWorker>();
         
         var dbPath = Path.Combine(Environment.CurrentDirectory, "ip2region.xdb");

@@ -1,4 +1,4 @@
-using Microsoft.Playwright;
+﻿using Microsoft.Playwright;
 
 namespace StarBlog.E2ETests;
 
@@ -30,7 +30,7 @@ public sealed class BasicNavigationTests {
         var page = await browser.NewPageAsync();
 
         await page.GotoAsync($"{baseUrl}/robots.txt", new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
-        var text = await page.EvaluateAsync<string>("() => document.body ? document.body.innerText : ''");
+        var text = await page.EvaluateAsync<string>("() => document.body   document.body.innerText : ''");
 
         Assert.Contains("Sitemap:", text, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("/sitemap.xml", text, StringComparison.OrdinalIgnoreCase);

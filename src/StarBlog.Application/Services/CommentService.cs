@@ -1,20 +1,19 @@
-using System.Net;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.RegularExpressions;
-using CodeLab.Share.Extensions;
+﻿using CodeLab.Share.Extensions;
 using CodeLab.Share.ViewModels;
 using FreeSql;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using StarBlog.Data.Models;
-using StarBlog.Content.Utils;
-using StarBlog.Application.Services.OutboxServices;
 using StarBlog.Application.Criteria;
+using StarBlog.Application.Services.OutboxServices;
+using StarBlog.Content.Utils;
+using StarBlog.Data.Models;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.RegularExpressions;
 using X.PagedList;
 
 namespace StarBlog.Application.Services;
 
+[ScopedDependency]
 public class CommentService {
     private readonly ILogger<CommentService> _logger;
     private readonly IBaseRepository<Comment> _commentRepo;
@@ -38,7 +37,7 @@ public class CommentService {
         _configuration = configuration;
     }
 
-    private List<Comment>? GetCommentsTree(List<Comment> commentsList, string? parentId = null) {
+    private List<Comment>  GetCommentsTree(List<Comment> commentsList, string  parentId = null) {
         var comments = commentsList.Where(e => e.Visible).ToList();
 
         if (parentId != null) {
@@ -53,7 +52,7 @@ public class CommentService {
         }).ToList();
     }
 
-    public async Task<List<Comment>?> GetAll(string postId) {
+    public async Task<List<Comment> > GetAll(string postId) {
         var comments = await _commentRepo.Where(a => a.PostId == postId).ToListAsync();
         return GetCommentsTree(comments);
     }
@@ -97,11 +96,11 @@ public class CommentService {
         return (data, pagedList.ToPaginationMetadata());
     }
 
-    public async Task<Comment?> GetById(string id) {
+    public async Task<Comment > GetById(string id) {
         return await _commentRepo.Where(a => a.Id == id).FirstAsync();
     }
 
-    public async Task<Comment> Accept(Comment comment, string? reason = null) {
+    public async Task<Comment> Accept(Comment comment, string  reason = null) {
         var wasNeedAudit = comment.IsNeedAudit;
         var wasVisible = comment.Visible;
         comment.Visible = true;
@@ -123,11 +122,11 @@ public class CommentService {
         return comment;
     }
 
-    public async Task<AnonymousUser?> GetAnonymousUser(string email) {
+    public async Task<AnonymousUser > GetAnonymousUser(string email) {
         return await _anonymousRepo.Where(a => a.Email == email).FirstAsync();
     }
 
-    public async Task<AnonymousUser> GetOrCreateAnonymousUser(string name, string email, string? url, string? ip) {
+    public async Task<AnonymousUser> GetOrCreateAnonymousUser(string name, string email, string  url, string  ip) {
         var item =
             await _anonymousRepo.Where(a => a.Email == email).FirstAsync() ??
             new AnonymousUser { Id = GuidUtils.GuidTo16String(), Email = email };
@@ -155,7 +154,7 @@ public class CommentService {
     /// <summary>
     /// 生成邮箱验证码，发送验证码邮件
     /// </summary>
-    public async Task<(bool, string?)> GenerateOtp(string email, bool mock = false) {
+    public async Task<(bool, string )> GenerateOtp(string email, bool mock = false) {
         var cacheKey = $"comment-otp-{email}";
         var hasCache = _memoryCache.TryGetValue<string>(cacheKey, out var existingValue);
         if (hasCache) return (false, existingValue);
@@ -212,11 +211,11 @@ public class CommentService {
         baseUrl = baseUrl.TrimEnd('/');
 
         var post = await _postRepo.Where(a => a.Id == replyComment.PostId).FirstAsync();
-        var postUrl = post?.Slug != null
+        var postUrl = post.Slug != null
             ? $"{baseUrl}/p/{Uri.EscapeDataString(post.Slug)}"
             : $"{baseUrl}/Blog/Post/{Uri.EscapeDataString(replyComment.PostId)}";
 
-        var safePostTitle = HtmlEncoder.Default.Encode(post?.Title ?? replyComment.PostId);
+        var safePostTitle = HtmlEncoder.Default.Encode(post.Title ?? replyComment.PostId);
         var safeReplierName = HtmlEncoder.Default.Encode(replier.Name);
         var safeReplyContent = HtmlEncoder.Default.Encode(replyComment.Content).Replace("\n", "<br>");
 

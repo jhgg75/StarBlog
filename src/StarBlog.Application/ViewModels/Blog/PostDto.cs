@@ -5,17 +5,17 @@ namespace StarBlog.Application.ViewModels.Blog;
 public sealed class PostDto {
     public string Id { get; init; } = string.Empty;
     public string Title { get; init; } = string.Empty;
-    public string? Slug { get; init; }
-    public string? Status { get; init; }
+    public string  Slug { get; init; }
+    public string  Status { get; init; }
     public bool IsPublish { get; init; }
-    public string? Summary { get; init; }
-    public string? Content { get; init; }
-    public string? Path { get; init; }
+    public string  Summary { get; init; }
+    public string  Content { get; init; }
+    public string  Path { get; init; }
     public DateTime CreationTime { get; init; }
     public DateTime LastUpdateTime { get; init; }
     public int CategoryId { get; init; }
-    public CategoryDto? Category { get; init; }
-    public string? Categories { get; init; }
+    public CategoryDto  Category { get; init; }
+    public string  Categories { get; init; }
 
     public static PostDto From(Post post) {
         return new PostDto {

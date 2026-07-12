@@ -5,7 +5,7 @@ namespace StarBlog.Application.ViewModels.Blog;
 public sealed class FeaturedPostDto {
     public int Id { get; init; }
     public string PostId { get; init; } = string.Empty;
-    public PostDto? Post { get; init; }
+    public PostDto  Post { get; init; }
 
     public static FeaturedPostDto From(FeaturedPost item) {
         return new FeaturedPostDto {

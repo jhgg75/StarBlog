@@ -2,6 +2,7 @@ using StarBlog.Application.Abstractions;
 
 namespace StarBlog.Application.Services;
 
+[SingletonDependency]
 public class ThemeService {
     public const string BootstrapTheme = "Bootstrap";
     private const string CssUrlPrefix = "/lib/bootswatch/dist";
