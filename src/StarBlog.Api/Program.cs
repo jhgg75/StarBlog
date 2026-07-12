@@ -1,166 +1,184 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Events;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using StarBlog.Application.Abstractions;
-using StarBlog.Api.Filters;
 using StarBlog.Api.Adapters;
+using StarBlog.Api.Extensions;
+using StarBlog.Api.Filters;
 using StarBlog.Api.Services.BackgroundTasks;
 using StarBlog.Api.Services.OutboxServices;
+using StarBlog.Application.Abstractions;
 using StarBlog.Application.Services;
 using StarBlog.Application.Services.OutboxServices;
 using StarBlog.Data;
 using StarBlog.Data.Extensions;
-using StarBlog.Api.Extensions;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-// 纯 WebAPI：仅注册 Controllers（不包含 MVC Views）
-// 同时启用全局响应包装，确保绝大多数 Action 的返回结构稳定一致（ApiResponse / ApiResponsePaged）。
-builder.Services.AddControllers(options => {
-    options.Filters.Add<ResponseWrapperFilter>();
-});
+try {
+    var builder = WebApplication.CreateBuilder(args);
 
-// 缓存与 HttpContextAccessor：部分服务（例如统计、IP/UA 解析、邮件/评论逻辑）会用到
-builder.Services.AddMemoryCache();
-builder.Services.AddHttpContextAccessor();
-
-// 响应压缩：对 JSON/XML/静态文本等响应启用 Brotli/Gzip，减少带宽消耗
-builder.Services.AddResponseCompression(options => {
-    options.EnableForHttps = true;
-    options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
-    options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
-    options.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults.MimeTypes.Concat(new[] {
-        "application/javascript",
-        "application/json",
-        "application/xml",
-        "text/css",
-        "text/html",
-        "text/json",
-        "text/plain",
-        "text/xml"
+    builder.Host.UseSerilog((context, services, loggerConfiguration) => {
+        loggerConfiguration
+            .ReadFrom.Configuration(context.Configuration)
+            .ReadFrom.Services(services)
+            .Enrich.FromLogContext()
+            .Enrich.WithProperty("Application", context.HostingEnvironment.ApplicationName)
+            .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName);
     });
-});
 
-builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProviderOptions>(options => {
-    options.Level = System.IO.Compression.CompressionLevel.Optimal;
-});
-
-builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProviderOptions>(options => {
-    options.Level = System.IO.Compression.CompressionLevel.Optimal;
-});
-
-// AutoMapper：控制器 DTO <-> Entity 的映射
-builder.Services.AddAutoMapper(typeof(Program));
-
-// 访问日志/统计用的 EF Core SQLite（与 FreeSql 业务库并存）
-builder.Services.AddDbContext<AppDbContext>(options => {
-    options.UseSqlite(builder.Configuration.GetConnectionString("SQLite-Log"));
-});
-
-// 业务数据访问（FreeSql）
-builder.Services.AddFreeSql(builder.Configuration);
-builder.Services.AddVisitRecord();
-builder.Services.AddHttpClient();
-
-// HealthChecks：提供 /health（汇总）、/health/live（存活）、/health/ready（就绪）端点
-builder.Services.AddStarBlogHealthChecks();
-
-// CORS：Next.js 前端跨域调用需要（带 Cookie/凭据时必须显式列出允许的 Origin）
-builder.Services.AddCors(options => {
-    options.AddDefaultPolicy(policyBuilder => {
-        policyBuilder.AllowCredentials();
-        policyBuilder.AllowAnyHeader();
-        policyBuilder.AllowAnyMethod();
-        policyBuilder.WithOrigins(
-            "http://localhost:3000",
-            "http://localhost:8080",
-            "http://localhost:8081",
-            "https://deali.cn",
-            "https://blog.deali.cn"
-        );
+    builder.Services.AddControllers(options => {
+        options.Filters.Add<ResponseWrapperFilter>();
     });
-});
 
-// Swagger：按既有分组输出 OpenAPI，并保留（可选）Swagger 访问授权中间件
-builder.Services.AddSwagger();
+    builder.Services.AddMemoryCache();
+    builder.Services.AddHttpContextAccessor();
 
-// AppSettings：加载邮件/监控/安全相关配置（其中 email/monitoring 的 json 文件为 optional）
-builder.Services.AddSettings(builder.Configuration);
-
-// JWT Bearer：后台管理相关接口依赖
-builder.Services.AddAuth(builder.Configuration);
-
-// ImageSharp：保留现有图片处理能力（例如图片相关服务与中间件链路）
-builder.Services.AddImageSharp();
-
-builder.Services.AddSingleton<IAppPathProvider, AspNetAppPathProvider>();
-builder.Services.AddSingleton<IFileStorage, PhysicalFileStorage>();
-builder.Services.AddSingleton<IClock, SystemClock>();
-builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-
-// 应用层服务：为了保证 API 行为与 StarBlog.Web 一致，首轮迁移直接沿用既有 Service 列表
-builder.Services.AddSingleton<CommonService>();
-builder.Services.AddSingleton<EmailService>();
-builder.Services.AddSingleton<ThemeService>();
-builder.Services.AddSingleton<TempFilterService>();
-builder.Services.AddSingleton<MonitoringService>();
-builder.Services.AddScoped<BlogService>();
-builder.Services.AddScoped<CategoryService>();
-builder.Services.AddScoped<CommentService>();
-builder.Services.AddScoped<ConfigService>();
-builder.Services.AddScoped<LinkExchangeService>();
-builder.Services.AddScoped<LinkService>();
-builder.Services.AddScoped<PhotoService>();
-builder.Services.AddScoped<PostService>();
-
-// Outbox：将“需要后台处理的任务”（例如邮件发送）异步化，避免阻塞接口响应
-builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection("Outbox"));
-builder.Services.AddScoped<OutboxService>();
-builder.Services.AddScoped<OutboxProcessor>();
-builder.Services.AddScoped<IOutboxHandler, EmailSendOutboxHandler>();
-builder.Services.AddHostedService<OutboxWorker>();
-builder.Services.AddHostedService<BackgroundTaskWorker>();
-
-// 上传/导入等场景可能包含大文件，放开 Kestrel 请求体大小限制（由业务逻辑自行校验）
-builder.WebHost.ConfigureKestrel(options => {
-    options.Limits.MaxRequestBodySize = long.MaxValue;
-});
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment()) {
-    app.UseDeveloperExceptionPage();
-}
-else {
-    app.UseExceptionHandler(applicationBuilder => {
-        applicationBuilder.Run(async context => {
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync(new { message = "Unexpected error!" });
+    builder.Services.AddResponseCompression(options => {
+        options.EnableForHttps = true;
+        options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
+        options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+        options.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults.MimeTypes.Concat(new[] {
+            "application/javascript",
+            "application/json",
+            "application/xml",
+            "text/css",
+            "text/html",
+            "text/json",
+            "text/plain",
+            "text/xml"
         });
     });
-    app.UseHsts();
+
+    builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProviderOptions>(options => {
+        options.Level = System.IO.Compression.CompressionLevel.Optimal;
+    });
+
+    builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProviderOptions>(options => {
+        options.Level = System.IO.Compression.CompressionLevel.Optimal;
+    });
+
+    builder.Services.AddAutoMapper(typeof(Program));
+
+    builder.Services.AddDbContext<AppDbContext>(options => {
+        options.UseSqlite(builder.Configuration.GetConnectionString("SQLite-Log"));
+    });
+
+    builder.Services.AddFreeSql(builder.Configuration);
+    builder.Services.AddVisitRecord();
+    builder.Services.AddHttpClient();
+    builder.Services.AddStarBlogHealthChecks();
+
+    builder.Services.AddCors(options => {
+        options.AddDefaultPolicy(policyBuilder => {
+            policyBuilder.AllowCredentials();
+            policyBuilder.AllowAnyHeader();
+            policyBuilder.AllowAnyMethod();
+            policyBuilder.WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "http://localhost:8081",
+                "https://deali.cn",
+                "https://blog.deali.cn"
+            );
+        });
+    });
+
+    builder.Services.AddSwagger();
+    builder.Services.AddSettings(builder.Configuration);
+    builder.Services.AddAuth(builder.Configuration);
+    builder.Services.AddImageSharp();
+
+    builder.Services.AddSingleton<IAppPathProvider, AspNetAppPathProvider>();
+    builder.Services.AddSingleton<IFileStorage, PhysicalFileStorage>();
+    builder.Services.AddSingleton<IClock, SystemClock>();
+    builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+
+    builder.Services.AddSingleton<CommonService>();
+    builder.Services.AddSingleton<EmailService>();
+    builder.Services.AddSingleton<ThemeService>();
+    builder.Services.AddSingleton<TempFilterService>();
+    builder.Services.AddSingleton<MonitoringService>();
+    builder.Services.AddScoped<BlogService>();
+    builder.Services.AddScoped<CategoryService>();
+    builder.Services.AddScoped<CommentService>();
+    builder.Services.AddScoped<ConfigService>();
+    builder.Services.AddScoped<LinkExchangeService>();
+    builder.Services.AddScoped<LinkService>();
+    builder.Services.AddScoped<PhotoService>();
+    builder.Services.AddScoped<PostService>();
+
+    builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection("Outbox"));
+    builder.Services.AddScoped<OutboxService>();
+    builder.Services.AddScoped<OutboxProcessor>();
+    builder.Services.AddScoped<IOutboxHandler, EmailSendOutboxHandler>();
+    builder.Services.AddHostedService<OutboxWorker>();
+    builder.Services.AddHostedService<BackgroundTaskWorker>();
+
+    builder.WebHost.ConfigureKestrel(options => {
+        options.Limits.MaxRequestBodySize = long.MaxValue;
+    });
+
+    var app = builder.Build();
+
+    if (app.Environment.IsDevelopment()) {
+        app.UseDeveloperExceptionPage();
+    }
+    else {
+        app.UseExceptionHandler(applicationBuilder => {
+            applicationBuilder.Run(async context => {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync(new { message = "Unexpected error!" });
+            });
+        });
+        app.UseHsts();
+    }
+
+    app.UseForwardedHeaders(new ForwardedHeadersOptions {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
+
+    app.UseSerilogRequestLogging(options => {
+        options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+        options.GetLevel = (httpContext, _, exception) => {
+            if (exception is not null || httpContext.Response.StatusCode >= StatusCodes.Status500InternalServerError) {
+                return LogEventLevel.Error;
+            }
+
+            if (httpContext.Response.StatusCode >= StatusCodes.Status400BadRequest) {
+                return LogEventLevel.Warning;
+            }
+
+            return LogEventLevel.Information;
+        };
+        options.EnrichDiagnosticContext = (diagnosticContext, httpContext) => {
+            diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value ?? string.Empty);
+            diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+            diagnosticContext.Set("ClientIp", httpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        };
+    });
+
+    app.UseImageSharp();
+    app.UseResponseCompression();
+    app.UseRouting();
+    app.UseCors();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.UseSwaggerPkg();
+
+    app.MapStarBlogHealthChecks();
+    app.MapControllers();
+
+    app.Run();
 }
-
-app.UseForwardedHeaders(new ForwardedHeadersOptions {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-
-// 说明：ImageSharp 中间件需要存在 webroot（本项目提供空的 wwwroot 目录以满足启动）
-app.UseImageSharp();
-app.UseResponseCompression();
-
-app.UseRouting();
-app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
-
-// Swagger UI 默认需要已认证用户才能访问（避免生产环境直接暴露文档）
-app.UseSwaggerPkg();
-
-app.MapStarBlogHealthChecks();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex) {
+    Log.Fatal(ex, "StarBlog.Api terminated unexpectedly");
+}
+finally {
+    Log.CloseAndFlush();
+}
 
 public partial class Program { }

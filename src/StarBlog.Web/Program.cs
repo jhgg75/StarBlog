@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using RobotsTxt;
+using Serilog;
+using Serilog.Events;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using StarBlog.Application.Abstractions;
 using StarBlog.Data;
@@ -13,214 +15,227 @@ using StarBlog.Web.Services;
 using StarBlog.Web.Services.BackgroundTasks;
 using StarBlog.Web.Services.OutboxServices;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
+try {
+    var builder = WebApplication.CreateBuilder(args);
 
-var mvcBuilder = builder.Services.AddControllersWithViews(options => { options.Filters.Add<ResponseWrapperFilter>(); }
-);
-
-// 开发模式启用Razor页面动态编译
-if (builder.Environment.IsDevelopment()) {
-    mvcBuilder.AddRazorRuntimeCompilation();
-}
-
-builder.Services.AddMemoryCache();
-builder.Services.AddHttpContextAccessor();
-
-// 添加响应压缩
-builder.Services.AddResponseCompression(options => {
-    options.EnableForHttps = true;
-
-    // 配置压缩提供程序（按优先级排序）
-    options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
-    options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
-
-    // 配置要压缩的 MIME 类型
-    options.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults.MimeTypes.Concat(new[] {
-        "application/javascript",
-        "application/json",
-        "application/xml",
-        "text/css",
-        "text/html",
-        "text/json",
-        "text/plain",
-        "text/xml"
+    builder.Host.UseSerilog((context, services, loggerConfiguration) => {
+        loggerConfiguration
+            .ReadFrom.Configuration(context.Configuration)
+            .ReadFrom.Services(services)
+            .Enrich.FromLogContext()
+            .Enrich.WithProperty("Application", context.HostingEnvironment.ApplicationName)
+            .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName);
     });
-});
 
-// 配置 Brotli 压缩级别
-builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProviderOptions>(options => {
-    options.Level = System.IO.Compression.CompressionLevel.Optimal;
-});
+    var mvcBuilder = builder.Services.AddControllersWithViews(options => { options.Filters.Add<ResponseWrapperFilter>(); });
 
-// 配置 Gzip 压缩级别
-builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProviderOptions>(options => {
-    options.Level = System.IO.Compression.CompressionLevel.Optimal;
-});
+    if (builder.Environment.IsDevelopment()) {
+        mvcBuilder.AddRazorRuntimeCompilation();
+    }
 
-builder.Services.AddSession(options => {
-    options.IdleTimeout = TimeSpan.FromHours(1);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
-builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddDbContext<AppDbContext>(options => {
-    options.UseSqlite(builder.Configuration.GetConnectionString("SQLite-Log"));
-});
-builder.Services.AddFreeSql(builder.Configuration);
-builder.Services.AddVisitRecord();
-builder.Services.AddHttpClient();
-builder.Services.AddCors(options => {
-    options.AddDefaultPolicy(policyBuilder => {
-        policyBuilder.AllowCredentials();
-        policyBuilder.AllowAnyHeader();
-        policyBuilder.AllowAnyMethod();
-        // policyBuilder.AllowAnyOrigin();
-        policyBuilder.WithOrigins(
-            "http://localhost:3000",
-            "http://localhost:8080",
-            "http://localhost:8081",
-            "https://deali.cn",
-            "https://blog.deali.cn"
-        );
-    });
-});
-builder.Services.AddStaticRobotsTxt(opt => {
-    var baseUrl = builder.Configuration["host"] ?? "https://blog.deali.cn";
-    opt.AddSection(section => section.AddUserAgent("Googlebot").Allow("/"))
-        .AddSection(section => section.AddUserAgent("bingbot").Allow("/"))
-        .AddSection(section => section.AddUserAgent("Bytespider").Disallow("/"))
-        .AddSection(section => section.AddUserAgent("Sogou web spider").Allow("/"))
-        .AddSection(section => section.AddUserAgent("*")
-            .Disallow("/Admin/")
-            .Disallow("/Api/")
-            .Disallow("/bin/")
-            .Disallow("/obj/")
-            .Disallow("/node_modules/")
-            .Disallow("/seo-test")
-            .Allow("/"))
-        .AddSitemap($"{baseUrl}/sitemap.xml")
-        .AddSitemap($"{baseUrl}/sitemap-images.xml");
+    builder.Services.AddMemoryCache();
+    builder.Services.AddHttpContextAccessor();
 
-    return opt;
-});
-builder.Services.AddSwagger();
-builder.Services.AddSettings(builder.Configuration);
-builder.Services.AddAuth(builder.Configuration);
-// 注册 IHttpClientFactory，参考：https://docs.microsoft.com/zh-cn/dotnet/core/extensions/http-client
-builder.Services.AddHttpClient();
-builder.Services.AddImageSharp();
-// 注册自定义服务
-builder.Services.AddSingleton<CommonService>();
-builder.Services.AddSingleton<EmailService>();
-builder.Services.AddSingleton<MessageService>();
-builder.Services.AddSingleton<ThemeService>();
-builder.Services.AddSingleton<TempFilterService>();
-builder.Services.AddSingleton<MonitoringService>();
-builder.Services.AddSingleton<IBackgroundTaskQueue, StarBlog.Application.Services.BackgroundTaskQueue>();
-builder.Services.AddScoped<BlogService>();
-builder.Services.AddScoped<CategoryService>();
-builder.Services.AddScoped<CommentService>();
-builder.Services.AddScoped<ConfigService>();
-builder.Services.AddScoped<LinkExchangeService>();
-builder.Services.AddScoped<LinkService>();
-builder.Services.AddScoped<PhotoService>();
-builder.Services.AddScoped<PostService>();
-builder.Services.AddScoped<SeoService>();
-builder.Services.AddScoped<StructuredDataService>();
-builder.Services.AddScoped<ImageSeoService>();
-builder.Services.AddScoped<SitemapService>();
-builder.Services.AddScoped<TranslationService>();
-
-// 翻译配置
-builder.Services.Configure<TranslationConfig>(builder.Configuration.GetSection(TranslationConfig.SectionName));
-
-builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection("Outbox"));
-builder.Services.AddScoped<OutboxService>();
-builder.Services.AddScoped<OutboxProcessor>();
-builder.Services.AddScoped<IOutboxHandler, EmailSendOutboxHandler>();
-builder.Services.AddHostedService<OutboxWorker>();
-builder.Services.AddHostedService<BackgroundTaskWorker>();
-
-// 设置请求最大大小
-builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = long.MaxValue; });
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
-    app.UseDeveloperExceptionPage();
-}
-else {
-    app.UseExceptionHandler(applicationBuilder => {
-        applicationBuilder.Run(async context => {
-            // todo 记录错误日志
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync(new { message = "Unexpected error!" });
+    builder.Services.AddResponseCompression(options => {
+        options.EnableForHttps = true;
+        options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
+        options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+        options.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults.MimeTypes.Concat(new[] {
+            "application/javascript",
+            "application/json",
+            "application/xml",
+            "text/css",
+            "text/html",
+            "text/json",
+            "text/plain",
+            "text/xml"
         });
     });
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+    builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProviderOptions>(options => {
+        options.Level = System.IO.Compression.CompressionLevel.Optimal;
+    });
 
-app.UseImageSharp();
-// app.UseHttpsRedirection();
+    builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProviderOptions>(options => {
+        options.Level = System.IO.Compression.CompressionLevel.Optimal;
+    });
 
-// 启用响应压缩
-app.UseResponseCompression();
+    builder.Services.AddSession(options => {
+        options.IdleTimeout = TimeSpan.FromHours(1);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+    });
+    builder.Services.AddAutoMapper(typeof(Program));
+    builder.Services.AddDbContext<AppDbContext>(options => {
+        options.UseSqlite(builder.Configuration.GetConnectionString("SQLite-Log"));
+    });
+    builder.Services.AddFreeSql(builder.Configuration);
+    builder.Services.AddVisitRecord();
+    builder.Services.AddHttpClient();
+    builder.Services.AddCors(options => {
+        options.AddDefaultPolicy(policyBuilder => {
+            policyBuilder.AllowCredentials();
+            policyBuilder.AllowAnyHeader();
+            policyBuilder.AllowAnyMethod();
+            policyBuilder.WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "http://localhost:8081",
+                "https://deali.cn",
+                "https://blog.deali.cn"
+            );
+        });
+    });
+    builder.Services.AddStaticRobotsTxt(opt => {
+        var baseUrl = builder.Configuration["host"] ?? "https://blog.deali.cn";
+        opt.AddSection(section => section.AddUserAgent("Googlebot").Allow("/"))
+            .AddSection(section => section.AddUserAgent("bingbot").Allow("/"))
+            .AddSection(section => section.AddUserAgent("Bytespider").Disallow("/"))
+            .AddSection(section => section.AddUserAgent("Sogou web spider").Allow("/"))
+            .AddSection(section => section.AddUserAgent("*")
+                .Disallow("/Admin/")
+                .Disallow("/Api/")
+                .Disallow("/bin/")
+                .Disallow("/obj/")
+                .Disallow("/node_modules/")
+                .Disallow("/seo-test")
+                .Allow("/"))
+            .AddSitemap($"{baseUrl}/sitemap.xml")
+            .AddSitemap($"{baseUrl}/sitemap-images.xml");
 
-// 添加静态文件调试中间件（仅在非生产环境）
-if (!app.Environment.IsProduction()) {
-    app.UseMiddleware<StaticFileDebugMiddleware>();
-}
+        return opt;
+    });
+    builder.Services.AddSwagger();
+    builder.Services.AddSettings(builder.Configuration);
+    builder.Services.AddAuth(builder.Configuration);
+    builder.Services.AddHttpClient();
+    builder.Services.AddImageSharp();
+    builder.Services.AddSingleton<CommonService>();
+    builder.Services.AddSingleton<EmailService>();
+    builder.Services.AddSingleton<MessageService>();
+    builder.Services.AddSingleton<ThemeService>();
+    builder.Services.AddSingleton<TempFilterService>();
+    builder.Services.AddSingleton<MonitoringService>();
+    builder.Services.AddSingleton<IBackgroundTaskQueue, StarBlog.Application.Services.BackgroundTaskQueue>();
+    builder.Services.AddScoped<BlogService>();
+    builder.Services.AddScoped<CategoryService>();
+    builder.Services.AddScoped<CommentService>();
+    builder.Services.AddScoped<ConfigService>();
+    builder.Services.AddScoped<LinkExchangeService>();
+    builder.Services.AddScoped<LinkService>();
+    builder.Services.AddScoped<PhotoService>();
+    builder.Services.AddScoped<PostService>();
+    builder.Services.AddScoped<SeoService>();
+    builder.Services.AddScoped<StructuredDataService>();
+    builder.Services.AddScoped<ImageSeoService>();
+    builder.Services.AddScoped<SitemapService>();
+    builder.Services.AddScoped<TranslationService>();
 
-// 配置静态文件缓存
-app.UseStaticFiles(new StaticFileOptions {
-    ServeUnknownFileTypes = true,
-    OnPrepareResponse = ctx => {
-        var path = ctx.Context.Request.Path.Value;
+    builder.Services.Configure<TranslationConfig>(builder.Configuration.GetSection(TranslationConfig.SectionName));
 
-        // 对于 JS 和 CSS 文件，设置较短的缓存时间以便调试
-        if (path != null && (path.EndsWith(".js") || path.EndsWith(".css"))) {
-            if (app.Environment.IsDevelopment()) {
-                // 开发环境不缓存 JS/CSS
-                ctx.Context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
-                ctx.Context.Response.Headers.Pragma = "no-cache";
-                ctx.Context.Response.Headers.Expires = "0";
+    builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection("Outbox"));
+    builder.Services.AddScoped<OutboxService>();
+    builder.Services.AddScoped<OutboxProcessor>();
+    builder.Services.AddScoped<IOutboxHandler, EmailSendOutboxHandler>();
+    builder.Services.AddHostedService<OutboxWorker>();
+    builder.Services.AddHostedService<BackgroundTaskWorker>();
+
+    builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = long.MaxValue; });
+
+    var app = builder.Build();
+
+    if (app.Environment.IsDevelopment()) {
+        app.UseDeveloperExceptionPage();
+    }
+    else {
+        app.UseExceptionHandler(applicationBuilder => {
+            applicationBuilder.Run(async context => {
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync(new { message = "Unexpected error!" });
+            });
+        });
+        app.UseHsts();
+    }
+
+    app.UseForwardedHeaders(new ForwardedHeadersOptions {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
+
+    app.UseSerilogRequestLogging(options => {
+        options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+        options.GetLevel = (httpContext, _, exception) => {
+            if (exception is not null || httpContext.Response.StatusCode >= StatusCodes.Status500InternalServerError) {
+                return LogEventLevel.Error;
+            }
+
+            if (httpContext.Response.StatusCode >= StatusCodes.Status400BadRequest) {
+                return LogEventLevel.Warning;
+            }
+
+            return LogEventLevel.Information;
+        };
+        options.EnrichDiagnosticContext = (diagnosticContext, httpContext) => {
+            diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value ?? string.Empty);
+            diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+            diagnosticContext.Set("ClientIp", httpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty);
+        };
+    });
+
+    app.UseImageSharp();
+    // app.UseHttpsRedirection();
+    app.UseResponseCompression();
+
+    if (!app.Environment.IsProduction()) {
+        app.UseMiddleware<StaticFileDebugMiddleware>();
+    }
+
+    app.UseStaticFiles(new StaticFileOptions {
+        ServeUnknownFileTypes = true,
+        OnPrepareResponse = ctx => {
+            var path = ctx.Context.Request.Path.Value;
+
+            if (path != null && (path.EndsWith(".js") || path.EndsWith(".css"))) {
+                if (app.Environment.IsDevelopment()) {
+                    ctx.Context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
+                    ctx.Context.Response.Headers.Pragma = "no-cache";
+                    ctx.Context.Response.Headers.Expires = "0";
+                }
+                else {
+                    const int shortDuration = 60 * 60 * 24;
+                    ctx.Context.Response.Headers.CacheControl = $"public,max-age={shortDuration}";
+                    ctx.Context.Response.Headers.Expires = DateTime.UtcNow.AddDays(1).ToString("R");
+                }
             }
             else {
-                // 生产环境短期缓存 JS/CSS
-                const int shortDuration = 60 * 60 * 24; // 1天
-                ctx.Context.Response.Headers.CacheControl = $"public,max-age={shortDuration}";
-                ctx.Context.Response.Headers.Expires = DateTime.UtcNow.AddDays(1).ToString("R");
+                const int durationInSeconds = 60 * 60 * 24 * 30;
+                ctx.Context.Response.Headers.CacheControl = $"public,max-age={durationInSeconds}";
+                ctx.Context.Response.Headers.Expires = DateTime.UtcNow.AddDays(30).ToString("R");
             }
         }
-        else {
-            // 其他静态文件长期缓存
-            const int durationInSeconds = 60 * 60 * 24 * 30; // 30天
-            ctx.Context.Response.Headers.CacheControl = $"public,max-age={durationInSeconds}";
-            ctx.Context.Response.Headers.Expires = DateTime.UtcNow.AddDays(30).ToString("R");
-        }
-    }
-});
+    });
 
-app.UseMiddleware<VisitRecordMiddleware>();
-app.UseRobotsTxt();
-app.UseRouting();
-app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
+    app.UseMiddleware<VisitRecordMiddleware>();
+    app.UseRobotsTxt();
+    app.UseRouting();
+    app.UseCors();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.UseSession();
+    app.UseSwaggerPkg();
 
-app.UseSession();
+    app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.UseSwaggerPkg();
-
-app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Run();
+    app.Run();
+}
+catch (Exception ex) {
+    Log.Fatal(ex, "StarBlog.Web terminated unexpectedly");
+}
+finally {
+    Log.CloseAndFlush();
+}
 
 public partial class Program { }

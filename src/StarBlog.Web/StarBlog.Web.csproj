@@ -39,6 +39,10 @@
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.8.0-preview.1.25412.6" />
         <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
         <PackageReference Include="RobotsTxtCore" Version="3.0.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
         <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.2" />
