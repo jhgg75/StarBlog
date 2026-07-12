@@ -1,4 +1,4 @@
-﻿using System.IO.Compression;
+using System.IO.Compression;
 using System.Text;
 using FreeSql;
 using StarBlog.Content.Utils;
@@ -50,8 +50,12 @@ public class BlogService {
         };
     }
 
-    public async Task<Post > GetTopOnePost() {
-        return (await _topPostRepo.Select.Include(a => a.Post.Category).FirstAsync()) .Post;
+    public async Task<Post> GetTopOnePost() {
+        var topPost = await _topPostRepo.Select
+            .Include(a => a.Post.Category)
+            .FirstAsync();
+
+        return topPost?.Post;
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿using CodeLab.Share.ViewModels.Response;
+using CodeLab.Share.ViewModels.Response;
 using FreeSql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,8 +31,8 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("Top")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Post >))]
-    public async Task<Post > GetTopOnePost() {
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Post>))]
+    public async Task<Post> GetTopOnePost() {
         return await _blogService.GetTopOnePost();
     }
 
