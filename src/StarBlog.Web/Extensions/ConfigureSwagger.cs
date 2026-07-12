@@ -1,6 +1,5 @@
-using Microsoft.OpenApi;
+﻿using Microsoft.OpenApi;
 using StarBlog.Web.Models;
-using StarBlog.Web.Middlewares;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
